@@ -81,9 +81,7 @@ interface VerifiedAccountService : AccountService {
 /**
  * 外部向けのインターフェイスの実装部分
  */
-class VerifiedAccountServiceImpl(
-    body : VerifiedAccountService
-) : VerifiedAccountService by body {
+class VerifiedAccountServiceImpl(delegate : VerifiedAccountService) : VerifiedAccountService by delegate {
     internal lateinit var accountName : String
 
     internal lateinit var rks : String

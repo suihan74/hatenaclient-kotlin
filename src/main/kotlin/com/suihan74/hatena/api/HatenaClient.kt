@@ -49,6 +49,9 @@ sealed class HatenaClientBase {
     /** ブクマ関係のAPI */
     abstract val bookmark : BookmarkService
 
+    /** エントリ関係のAPI */
+    abstract val entry : EntryService
+
     @OptIn(ExperimentalSerializationApi::class)
     protected fun retrofitBuilder(baseUrl: String) =
         Retrofit.Builder()
@@ -79,6 +82,11 @@ class HatenaClient : HatenaClientBase() {
 
     /** ブクマ関係のAPI */
     override val bookmark : BookmarkService by lazy { retrofitForBookmark.create(BookmarkService::class.java) }
+
+    /** エントリ関係のAPI */
+    override val entry : EntryService by lazy {
+        EntryServiceImpl(retrofitForBookmark.create(EntryService::class.java))
+    }
 
     // ------ //
 
@@ -159,9 +167,16 @@ class VerifiedHatenaClient internal constructor() : HatenaClientBase() {
 
     // ------ //
 
+    /** アカウント関係のAPI */
     override val user : VerifiedAccountService by lazy {
         VerifiedAccountServiceImpl(retrofitForBookmark.create(VerifiedAccountService::class.java))
     }
 
+    /** ブクマ関係のAPI */
     override val bookmark : BookmarkService by lazy { retrofitForBookmark.create(BookmarkService::class.java) }
+
+    /** エントリ関係のAPI */
+    override val entry : EntryService by lazy {
+        EntryServiceImpl(retrofitForBookmark.create(EntryService::class.java))
+    }
 }
