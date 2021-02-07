@@ -8,9 +8,11 @@ import kotlinx.serialization.json.Json
 import org.junit.Test
 
 class EntryServiceTest {
-    @Test
-    fun getHotEntries() = runBlocking {
-        HatenaClient().entry.getEntries(EntriesType.HOT, Category.ALL).let { entries ->
+    private val client = HatenaClient()
+
+    private suspend fun getEntries(entriesType: EntriesType, category: Category) {
+        println("type = " + entriesType.name + " | category = " + category.name)
+        client.entry.getEntries(entriesType, category).let { entries ->
             assert(entries.isNotEmpty())
             entries.forEach {
                 println(Json.encodeToString(it))
@@ -18,13 +20,14 @@ class EntryServiceTest {
         }
     }
 
+    // ------ //
+
     @Test
-    fun getRecentEntries() = runBlocking {
-        HatenaClient().entry.getEntries(EntriesType.RECENT, Category.ALL).let { entries ->
-            assert(entries.isNotEmpty())
-            entries.forEach {
-                println(Json.encodeToString(it))
-            }
+    fun testAllEntries() = runBlocking {
+        Category.values().forEach {
+            getEntries(EntriesType.HOT, it)
+            getEntries(EntriesType.RECENT, it)
+            println("=========================")
         }
     }
 }

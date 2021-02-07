@@ -38,7 +38,7 @@ data class Entry(
     val imageUrl : String = "https://b.st-hatena.com/images/v4/public/common/noimage.png",
 
     @SerialName("image_l")
-    val largeImage : ImageInfo,
+    val largeImage : ImageInfo? = null,
 
     @SerialName("amp_url")
     val ampUrl : String? = null,
