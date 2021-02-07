@@ -9,7 +9,7 @@ import org.junit.Test
 
 /*
  * テストの実行にはテストユーザーの認証情報が必要になります
- * 以下の内容の抽象クラスを用意してください
+ * 以下のような内容の抽象クラスを用意してください
  */
 /*
 abstract class AccountServiceTestCredentials {
