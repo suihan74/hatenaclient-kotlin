@@ -37,7 +37,7 @@ internal open class InstantISO8601Serializer : KSerializer<Instant> {
  *
  * タイムゾーンが渡されてこないので，暗黙的に"Asia/Tokyo"として処理する
  */
-internal class InstantBookmarksEntryTimestampSerializer : KSerializer<Instant> {
+internal class BookmarksEntryTimestampSerializer : KSerializer<Instant> {
     private val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm")
     private val zoneId = ZoneId.of("Asia/Tokyo")
 
@@ -51,5 +51,23 @@ internal class InstantBookmarksEntryTimestampSerializer : KSerializer<Instant> {
     override fun deserialize(decoder: Decoder): Instant {
         val localDateTime = LocalDateTime.parse(decoder.decodeString(), formatter)
         return ZonedDateTime.of(localDateTime, zoneId).toInstant()
+    }
+}
+
+// ------ //
+
+/**
+ * エポックタイム値とInstantを変換するためのシリアライザ
+ */
+internal class EpochTimeSerializer : KSerializer<Instant> {
+    override val descriptor: SerialDescriptor
+        get() = PrimitiveSerialDescriptor(this::class.qualifiedName!!, PrimitiveKind.LONG)
+
+    override fun serialize(encoder: Encoder, value: Instant) {
+        encoder.encodeLong(value.epochSecond)
+    }
+
+    override fun deserialize(decoder: Decoder): Instant {
+        return Instant.ofEpochSecond(decoder.decodeLong())
     }
 }

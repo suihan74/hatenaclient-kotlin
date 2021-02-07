@@ -1,6 +1,6 @@
 package com.suihan74.hatena.account
 
-import com.suihan74.hatena.account.serializer.BooleanAsBinarySerializer
+import com.suihan74.hatena.serializer.BooleanAsBinarySerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

@@ -1,4 +1,4 @@
-package com.suihan74.hatena.star.serializer
+package com.suihan74.hatena.serializer
 
 import com.suihan74.hatena.star.StarColor
 import kotlinx.serialization.KSerializer

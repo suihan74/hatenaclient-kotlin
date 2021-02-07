@@ -9,7 +9,7 @@ import java.time.ZoneOffset
 class InstantBookmarksEntryTimestampSerializerTest {
     @Test
     fun encode() {
-        val serializer = InstantBookmarksEntryTimestampSerializer()
+        val serializer = BookmarksEntryTimestampSerializer()
         val src = "\"2021/12/06 13:30\""
         val decoded = Json.decodeFromString(serializer, src)
 

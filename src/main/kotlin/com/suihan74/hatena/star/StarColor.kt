@@ -1,6 +1,6 @@
 package com.suihan74.hatena.star
 
-import com.suihan74.hatena.star.serializer.StarColorSerializer
+import com.suihan74.hatena.serializer.StarColorSerializer
 import kotlinx.serialization.Serializable
 import java.util.*
 

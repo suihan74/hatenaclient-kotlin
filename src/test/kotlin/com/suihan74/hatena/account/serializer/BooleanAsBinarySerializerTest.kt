@@ -1,5 +1,6 @@
 package com.suihan74.hatena.account.serializer
 
+import com.suihan74.hatena.serializer.BooleanAsBinarySerializer
 import kotlinx.serialization.json.Json
 import org.junit.Assert
 import org.junit.Test

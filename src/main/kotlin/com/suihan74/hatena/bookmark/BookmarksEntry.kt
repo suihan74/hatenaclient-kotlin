@@ -1,6 +1,6 @@
 package com.suihan74.hatena.bookmark
 
-import com.suihan74.hatena.bookmark.serializer.InstantBookmarksEntryTimestampSerializer
+import com.suihan74.hatena.bookmark.serializer.BookmarksEntryTimestampSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.time.Instant
@@ -46,7 +46,7 @@ data class BookmarksEntry (
 
         val tags : List<String> = emptyList(),
 
-        @Serializable(with = InstantBookmarksEntryTimestampSerializer::class)
+        @Serializable(with = BookmarksEntryTimestampSerializer::class)
         val timestamp : Instant
     ) {
 

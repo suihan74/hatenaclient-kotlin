@@ -1,4 +1,4 @@
-package com.suihan74.hatena.account.serializer
+package com.suihan74.hatena.serializer
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
