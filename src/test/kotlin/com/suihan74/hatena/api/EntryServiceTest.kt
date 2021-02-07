@@ -10,7 +10,7 @@ import org.junit.Test
 class EntryServiceTest {
     @Test
     fun getHotEntries() = runBlocking {
-        HatenaClient().entry.getEntries(EntriesType.HOT, Category.All).let { entries ->
+        HatenaClient().entry.getEntries(EntriesType.HOT, Category.ALL).let { entries ->
             assert(entries.isNotEmpty())
             entries.forEach {
                 println(Json.encodeToString(it))
@@ -20,7 +20,7 @@ class EntryServiceTest {
 
     @Test
     fun getRecentEntries() = runBlocking {
-        HatenaClient().entry.getEntries(EntriesType.RECENT, Category.All).let { entries ->
+        HatenaClient().entry.getEntries(EntriesType.RECENT, Category.ALL).let { entries ->
             assert(entries.isNotEmpty())
             entries.forEach {
                 println(Json.encodeToString(it))
