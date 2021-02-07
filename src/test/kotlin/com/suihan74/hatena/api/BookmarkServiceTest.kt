@@ -16,12 +16,12 @@ import java.net.URLEncoder
 internal class BookmarkServiceTest {
     private val testUrl = "https://togetter.com/li/1647315"
 
-    private fun createMock(responseBuilder: MockWebServer.()->Unit) : Pair<MockWebServer, HatenaClient> {
+    private fun createMock(responseBuilder: MockWebServer.()->Unit) : Pair<MockWebServer, HatenaClientBase> {
         val server = MockWebServer().also {
             responseBuilder(it)
         }
 
-        val hatenaApi = spy<HatenaClient>().apply {
+        val hatenaApi = spy<HatenaClientBaseNoCertificationRequired>().apply {
             whenever(baseUrlW) doReturn server.url("").toString()
             whenever(baseUrlB) doReturn server.url("").toString()
             whenever(baseUrlS) doReturn server.url("").toString()
@@ -47,6 +47,7 @@ internal class BookmarkServiceTest {
         }.onFailure {
             it.printStackTrace()
         }.onSuccess {
+            println(it.toString())
             Assert.fail()
         }
 
@@ -136,7 +137,7 @@ internal class BookmarkServiceTest {
 
     @Test
     fun getBookmarksEntry() = runBlocking {
-        HatenaClient().bookmark.getBookmarksEntry(testUrl).let {
+        HatenaClient.bookmark.getBookmarksEntry(testUrl).let {
             assert(it.id > 0)
             println("id = " + it.id)
             println("title = " + it.title)

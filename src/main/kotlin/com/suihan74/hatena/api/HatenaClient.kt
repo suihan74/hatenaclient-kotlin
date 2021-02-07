@@ -67,9 +67,9 @@ sealed class HatenaClientBase {
 // ------ //
 
 /**
- * サインイン無しで使用できるAPI群
+ * サインイン無しで使用できるAPI群(mockテスト用途)
  */
-class HatenaClient : HatenaClientBase() {
+abstract class HatenaClientBaseNoCertificationRequired : HatenaClientBase() {
     override val okHttpClient by lazy {
         OkHttpClient.Builder()
             .build()
@@ -88,34 +88,22 @@ class HatenaClient : HatenaClientBase() {
 
     // ------ //
 
-    companion object {
-        /** サインインが必要なAPIが使用できるインスタンスを作成する */
-        suspend fun signIn(name: String, password: String) : CertifiedHatenaClient {
-            return CertifiedHatenaClient().also {
-                it.user.__signInImpl(name, password)
-                it.user.getAccount().let { account ->
-                    it.initializeAccount(account)
-                }
-            }
-        }
+    /** サインインが必要なAPIが使用できるインスタンスを作成する */
+    abstract suspend fun signIn(name: String, password: String) : CertifiedHatenaClient
 
-        /** Cookieを利用して再ログイン */
-        suspend fun signIn(rk: String) : CertifiedHatenaClient {
-            return CertifiedHatenaClient().also {
-                it.cookieManager.cookieStore.add(
-                    URI.create(baseUrlW),
-                    HttpCookie("rk", rk).also { cookie ->
-                        cookie.domain = ".hatena.ne.jp"
-                        cookie.path = "/"
-                        cookie.maxAge = -1
-                    }
-                )
-                it.user.getAccount().let { account ->
-                    it.initializeAccount(account)
-                }
-            }
-        }
-    }
+    /** Cookieを利用して再ログイン */
+    abstract suspend fun signIn(rk: String) : CertifiedHatenaClient
+}
+
+/**
+ * サインイン無しで使用できるAPI群
+ */
+object HatenaClient : HatenaClientBaseNoCertificationRequired() {
+    /** サインインが必要なAPIが使用できるインスタンスを作成する */
+    override suspend fun signIn(name: String, password: String) = CertifiedHatenaClient.createInstance(name, password)
+
+    /** Cookieを利用して再ログイン */
+    override suspend fun signIn(rk: String) = CertifiedHatenaClient.createInstance(rk)
 }
 
 // ------ //
@@ -175,4 +163,34 @@ class CertifiedHatenaClient internal constructor() : HatenaClientBase() {
 
     /** エントリ関係のAPI */
     override val entry : CertifiedEntryService by lazy { retrofitForBookmark.create(CertifiedEntryService::class.java) }
+
+    // ------ //
+
+    companion object {
+        /**
+         * ユーザーIDとパスワードでサインインして認証済みクライアントを作成する
+         */
+        suspend fun createInstance(name: String, password: String) = CertifiedHatenaClient().also {
+            it.user.__signInImpl(name, password)
+            it.user.getAccount().let { account ->
+                it.initializeAccount(account)
+            }
+        }
+        /**
+         * 認証情報rkで再サインインして認証済みクライアントを作成する
+         */
+        suspend fun createInstance(rk: String) = CertifiedHatenaClient().also {
+            it.cookieManager.cookieStore.add(
+                URI.create(baseUrlW),
+                HttpCookie("rk", rk).also { cookie ->
+                    cookie.domain = ".hatena.ne.jp"
+                    cookie.path = "/"
+                    cookie.maxAge = -1
+                }
+            )
+            it.user.getAccount().let { account ->
+                it.initializeAccount(account)
+            }
+        }
+    }
 }

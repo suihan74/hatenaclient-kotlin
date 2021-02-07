@@ -57,6 +57,9 @@ suspend fun EntryService.getEntries(
 
 // ------ //
 
+/**
+ * 認証が必要なエントリ関係API
+ */
 interface CertifiedEntryService : EntryService {
     @GET("api/ipad.mybookmarks")
     suspend fun getBookmarkedEntries(

@@ -8,11 +8,9 @@ import kotlinx.serialization.json.Json
 import org.junit.Test
 
 class EntryServiceTest : AccountServiceTestCredentials() {
-    private val client = HatenaClient()
-
     private suspend fun getEntries(entriesType: EntriesType, category: Category) {
         println("type = " + entriesType.name + " | category = " + category.name)
-        client.entry.getEntries(entriesType, category).let { entries ->
+        HatenaClient.entry.getEntries(entriesType, category).let { entries ->
             assert(entries.isNotEmpty())
             entries.forEach {
                 println(Json.encodeToString(it))
