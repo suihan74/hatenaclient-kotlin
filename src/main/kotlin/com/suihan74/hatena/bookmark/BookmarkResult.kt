@@ -22,6 +22,9 @@ data class BookmarkResult (
     @Serializable(with = EpochTimeSerializer::class)
     val timestamp : Instant,
 
+    @SerialName("timestamp")
+    private val _timestamp : String,
+
     @SerialName("user_icon_url")
     val userIconUrl : String,
 
@@ -40,5 +43,6 @@ data class BookmarkResult (
 
     val eid : Long? = null,
 
+    @SerialName("star_count")
     val starsCount : List<Star>? = null
 )

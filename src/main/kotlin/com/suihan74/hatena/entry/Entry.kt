@@ -3,6 +3,7 @@ package com.suihan74.hatena.entry
 import com.suihan74.hatena.api.HatenaClientBase
 import com.suihan74.hatena.bookmark.BookmarkResult
 import com.suihan74.hatena.bookmark.serializer.InstantISO8601Serializer
+import com.suihan74.hatena.star.StarCount
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.net.URI
@@ -51,7 +52,15 @@ data class Entry(
     val myHotEntryComments : List<BookmarkResult>? = null,
 
     @Serializable(with = InstantISO8601Serializer::class)
-    val date: Instant? = null
+    val date : Instant? = null,
+
+    // BookmarkedEntriesに含まれる
+    @SerialName("is_wiped")
+    val isWiped : Boolean = false,
+
+    // BookmarkedEntriesに含まれる
+    @SerialName("star_count")
+    val starCount: List<StarCount> = emptyList()
 ) {
     val entryUrl : String by lazy {
         _entryUrl ?: buildString {

@@ -7,7 +7,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.Test
 
-class EntryServiceTest {
+class EntryServiceTest : AccountServiceTestCredentials() {
     private val client = HatenaClient()
 
     private suspend fun getEntries(entriesType: EntriesType, category: Category) {
@@ -28,6 +28,18 @@ class EntryServiceTest {
             getEntries(EntriesType.HOT, it)
             getEntries(EntriesType.RECENT, it)
             println("=========================")
+        }
+    }
+
+    // ------ //
+
+    @Test
+    fun getBookmarkedEntries() = runBlocking {
+        val client = HatenaClient.signIn(rk)
+        client.entry.getBookmarkedEntries().let { entries ->
+            entries.forEach {
+                println(Json.encodeToString(it))
+            }
         }
     }
 }

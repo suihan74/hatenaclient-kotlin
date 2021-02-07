@@ -84,9 +84,7 @@ class HatenaClient : HatenaClientBase() {
     override val bookmark : BookmarkService by lazy { retrofitForBookmark.create(BookmarkService::class.java) }
 
     /** エントリ関係のAPI */
-    override val entry : EntryService by lazy {
-        EntryServiceImpl(retrofitForBookmark.create(EntryService::class.java))
-    }
+    override val entry : EntryService by lazy { retrofitForBookmark.create(EntryService::class.java) }
 
     // ------ //
 
@@ -176,7 +174,5 @@ class CertifiedHatenaClient internal constructor() : HatenaClientBase() {
     override val bookmark : BookmarkService by lazy { retrofitForBookmark.create(BookmarkService::class.java) }
 
     /** エントリ関係のAPI */
-    override val entry : EntryService by lazy {
-        EntryServiceImpl(retrofitForBookmark.create(EntryService::class.java))
-    }
+    override val entry : CertifiedEntryService by lazy { retrofitForBookmark.create(CertifiedEntryService::class.java) }
 }
