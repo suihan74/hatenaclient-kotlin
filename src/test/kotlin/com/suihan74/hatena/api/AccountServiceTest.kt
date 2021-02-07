@@ -7,6 +7,18 @@ import kotlinx.serialization.json.Json
 import org.junit.Assert
 import org.junit.Test
 
+/*
+ * テストの実行にはテストユーザーの認証情報が必要になります
+ * 以下の内容の抽象クラスを用意してください
+ */
+/*
+abstract class AccountServiceTestCredentials {
+    protected val user = "suihan74"
+    protected val password = "hogehoge"
+    protected val rk = "foobarbaz"
+}
+*/
+
 internal class AccountServiceTest : AccountServiceTestCredentials() {
     @Test
     fun signIn() = runBlocking {
