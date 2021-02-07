@@ -46,6 +46,14 @@ interface EntryService {
         includeBookmarksOfFollowings: Boolean = true,
         includeAds: Boolean = false
     ) : List<Entry>
+
+    // ------ //
+
+    @GET("api/ipad.mybookmarks")
+    suspend fun getBookmarkedEntries(
+        @Query("limit") limit: Int? = null,
+        @Query("of") offset: Int? = null
+    ) : List<Entry>
 }
 
 // ------ //
@@ -72,3 +80,5 @@ class EntryServiceImpl(delegate : EntryService) : EntryService by delegate {
         includeAMPUrls.int, includeBookmarkedData.int, includeBookmarksOfFollowings.int, includeAds.int
     )
 }
+
+class Certified

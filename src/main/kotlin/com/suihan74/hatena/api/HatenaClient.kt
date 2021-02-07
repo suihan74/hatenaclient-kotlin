@@ -92,8 +92,8 @@ class HatenaClient : HatenaClientBase() {
 
     companion object {
         /** サインインが必要なAPIが使用できるインスタンスを作成する */
-        suspend fun signIn(name: String, password: String) : VerifiedHatenaClient {
-            return VerifiedHatenaClient().also {
+        suspend fun signIn(name: String, password: String) : CertifiedHatenaClient {
+            return CertifiedHatenaClient().also {
                 it.user.__signInImpl(name, password)
                 it.user.getAccount().let { account ->
                     it.initializeAccount(account)
@@ -102,8 +102,8 @@ class HatenaClient : HatenaClientBase() {
         }
 
         /** Cookieを利用して再ログイン */
-        suspend fun signIn(rk: String) : VerifiedHatenaClient {
-            return VerifiedHatenaClient().also {
+        suspend fun signIn(rk: String) : CertifiedHatenaClient {
+            return CertifiedHatenaClient().also {
                 it.cookieManager.cookieStore.add(
                     URI.create(baseUrlW),
                     HttpCookie("rk", rk).also { cookie ->
@@ -125,7 +125,7 @@ class HatenaClient : HatenaClientBase() {
 /**
  * サインイン状態で使用できるAPI群
  */
-class VerifiedHatenaClient internal constructor() : HatenaClientBase() {
+class CertifiedHatenaClient internal constructor() : HatenaClientBase() {
     val cookieManager by lazy {
         CookieManager().apply {
             setCookiePolicy(CookiePolicy.ACCEPT_ALL)
@@ -159,7 +159,7 @@ class VerifiedHatenaClient internal constructor() : HatenaClientBase() {
     internal fun initializeAccount(account: Account) {
         accountName = account.name
         rks = account.rks
-        (user as VerifiedAccountServiceImpl).let {
+        (user as CertifiedAccountServiceImpl).let {
             it.accountName = accountName
             it.rks = rks
         }
@@ -168,8 +168,8 @@ class VerifiedHatenaClient internal constructor() : HatenaClientBase() {
     // ------ //
 
     /** アカウント関係のAPI */
-    override val user : VerifiedAccountService by lazy {
-        VerifiedAccountServiceImpl(retrofitForBookmark.create(VerifiedAccountService::class.java))
+    override val user : CertifiedAccountService by lazy {
+        CertifiedAccountServiceImpl(retrofitForBookmark.create(CertifiedAccountService::class.java))
     }
 
     /** ブクマ関係のAPI */

@@ -30,7 +30,7 @@ interface AccountService {
 /**
  * 要認証のアカウント関係API
  */
-interface VerifiedAccountService : AccountService {
+interface CertifiedAccountService : AccountService {
     /**
      * アカウント情報を取得
      */
@@ -81,7 +81,7 @@ interface VerifiedAccountService : AccountService {
 /**
  * 外部向けのインターフェイスの実装部分
  */
-class VerifiedAccountServiceImpl(delegate : VerifiedAccountService) : VerifiedAccountService by delegate {
+class CertifiedAccountServiceImpl(delegate : CertifiedAccountService) : CertifiedAccountService by delegate {
     internal lateinit var accountName : String
 
     internal lateinit var rks : String
