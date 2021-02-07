@@ -15,8 +15,7 @@ import java.time.Instant
 data class Entry(
     val eid : Long,
 
-    @SerialName("title")
-    private val _title : String,
+    val title : String,
 
     val description : String,
 
@@ -54,17 +53,6 @@ data class Entry(
     @Serializable(with = InstantISO8601Serializer::class)
     val date: Instant? = null
 ) {
-    val title : String by lazy {
-        _title.indexOfFirst { it == '\n' }.let {
-            if (it < 0) {
-                _title
-            }
-            else {
-                _title.substring(0 until it)
-            }
-        }
-    }
-
     val entryUrl : String by lazy {
         _entryUrl ?: buildString {
             append(HatenaClientBase.baseUrlB, "entry/")
