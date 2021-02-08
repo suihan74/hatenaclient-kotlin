@@ -23,3 +23,6 @@ data class Issue (
 
 @Serializable
 data class IssuesResponse(val issues: List<Issue>)
+
+@Serializable
+data class IssueEntriesResponse(val issue: Issue, val entries: List<IssueEntry>)

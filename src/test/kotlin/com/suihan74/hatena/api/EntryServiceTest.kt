@@ -2,6 +2,7 @@ package com.suihan74.hatena.api
 
 import com.suihan74.hatena.entry.Category
 import com.suihan74.hatena.entry.EntriesType
+import com.suihan74.hatena.entry.Issue
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -12,6 +13,20 @@ class EntryServiceTest : AccountServiceTestCredentials() {
     private suspend fun getEntries(entriesType: EntriesType, category: Category) {
         println("type = " + entriesType.name + " | category = " + category.name)
         HatenaClient.entry.getEntries(entriesType, category).let { entries ->
+            assert(entries.isNotEmpty())
+            entries.forEach {
+                println(Json.encodeToString(it))
+                println("  entryUrl = " + it.entryUrl)
+                println("  rootUrl = " + it.rootUrl)
+                println("  imageUrl = " + it.imageUrl)
+                println("  faviconUrl = " + it.faviconUrl)
+            }
+        }
+    }
+
+    private suspend fun getEntries(entriesType: EntriesType, issue: Issue) {
+        println("type = " + entriesType.name + " | category = " + issue.name)
+        HatenaClient.entry.getEntries(entriesType, issue).let { entries ->
             assert(entries.isNotEmpty())
             entries.forEach {
                 println(Json.encodeToString(it))
@@ -53,13 +68,18 @@ class EntryServiceTest : AccountServiceTestCredentials() {
         Category.values().forEach {
             println("===== " + it.name + " =====")
             runCatching {
-                HatenaClient.entry.getIssues(it).forEach { issue ->
+                HatenaClient.entry.getIssues(it).forEachIndexed { index, issue ->
                     println(Json.encodeToString(issue))
                     issue.entry!!.let { entry ->
                         println("  entryUrl = " + entry.entryUrl)
                         println("  rootUrl = " + entry.rootUrl)
                         println("  imageUrl = " + entry.imageUrl)
                         println("  faviconUrl = " + entry.faviconUrl)
+                    }
+
+                    if (index == 0) {
+                        getEntries(EntriesType.HOT, issue)
+                        getEntries(EntriesType.RECENT, issue)
                     }
                 }
             }.onFailure { e ->

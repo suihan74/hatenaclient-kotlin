@@ -1,9 +1,12 @@
 package com.suihan74.hatena.entry
 
-enum class EntriesType(val code : String) {
-    HOT("hotentry"),
+enum class EntriesType(
+    val code : String,
+    val codeForIssues : String,
+) {
+    HOT("hotentry", "hotentries"),
 
-    RECENT("newentry"),
+    RECENT("newentry", "newentries"),
     ;
 
     companion object {
