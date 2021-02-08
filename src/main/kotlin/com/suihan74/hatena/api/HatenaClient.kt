@@ -53,10 +53,12 @@ sealed class HatenaClientBase {
     abstract val entry : EntryService
 
     @OptIn(ExperimentalSerializationApi::class)
-    protected fun retrofitBuilder(baseUrl: String) =
+    protected fun retrofitBuilder(baseUrl: String) : Retrofit.Builder =
         Retrofit.Builder()
             .baseUrl(baseUrl)
-            .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(
+                Json.asConverterFactory("application/json".toMediaType())
+            )
             .client(okHttpClient)
 
     protected val retrofitForBookmark by lazy { retrofitBuilder(baseUrlB).build() }

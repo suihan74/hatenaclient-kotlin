@@ -1,8 +1,6 @@
 package com.suihan74.hatena.api
 
-import com.suihan74.hatena.entry.Category
-import com.suihan74.hatena.entry.EntriesType
-import com.suihan74.hatena.entry.Entry
+import com.suihan74.hatena.entry.*
 import com.suihan74.hatena.extension.int
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -12,6 +10,11 @@ import retrofit2.http.Query
  * エントリ関連のAPI
  */
 interface EntryService {
+    /**
+     * 人気/新着エントリを取得する
+     *
+     * @see EntryService.getEntries
+     */
     @GET("/api/ipad.{type}.json")
     suspend fun __getEntries(
         @Path("type") entriesType: String,
@@ -22,7 +25,13 @@ interface EntryService {
         @Query("include_bookmarked_data") includeBookmarkedData: Int,
         @Query("include_bookmarks_of_followings") includeBookmarksOfFollowings: Int,
         @Query("ad") includeAds: Int
-    ) : List<Entry>
+    ) : List<EntryItem>
+
+    /**
+     * 指定カテゴリの特集一覧を取得する
+     */
+    @GET("api/internal/cambridge/category/{category_id}/issues")
+    suspend fun __getIssues(@Path("category_id") categoryCode: String) : IssuesResponse
 }
 
 // ------ //
@@ -48,12 +57,20 @@ suspend fun EntryService.getEntries(
     includeBookmarkedData: Boolean = true,
     includeBookmarksOfFollowings: Boolean = true,
     includeAds: Boolean = false
-) : List<Entry> = __getEntries(
+) : List<EntryItem> = __getEntries(
     entriesType.code,
     category.code,
     limit, offset,
     includeAMPUrls.int, includeBookmarkedData.int, includeBookmarksOfFollowings.int, includeAds.int
 )
+
+/**
+ * 指定カテゴリの特集一覧を取得する
+ *
+ * @param category カテゴリ
+ */
+suspend fun EntryService.getIssues(category: Category) : List<Issue> =
+    __getIssues(category.code).issues
 
 // ------ //
 
@@ -61,9 +78,15 @@ suspend fun EntryService.getEntries(
  * 認証が必要なエントリ関係API
  */
 interface CertifiedEntryService : EntryService {
+    /**
+     * ユーザーがブクマしたエントリ一覧を取得する
+     *
+     * @param limit 最大件数
+     * @param offset 取得開始位置
+     */
     @GET("api/ipad.mybookmarks")
     suspend fun getBookmarkedEntries(
         @Query("limit") limit: Int? = null,
         @Query("of") offset: Int? = null
-    ) : List<Entry>
+    ) : List<EntryItem>
 }
