@@ -44,7 +44,7 @@ data class BookmarksEntry (
 
         val comment : String,
 
-        val tags : List<String> = emptyList(),
+        val tags : List<String>,
 
         @Serializable(with = BookmarksEntryTimestampSerializer::class)
         val timestamp : Instant

@@ -58,11 +58,18 @@ sealed class Entry {
     }
 
     val imageUrl : String by lazy {
-        _imageUrl ?: "https://b.st-hatena.com/images/v4/public/common/noimage.png"
+        _imageUrl ?: IMAGE_URL_NO_IMAGE
     }
 
     val faviconUrl : String by lazy {
-        _faviconUrl ?: "https://www.google.com/s2/favicons?domain=${URI.create(url).host}"
+        _faviconUrl ?: TEMP_FAVICON_URL_BASE + URI.create(url).host
+    }
+
+    // ------ //
+
+    companion object {
+        const val IMAGE_URL_NO_IMAGE = "https://b.st-hatena.com/images/v4/public/common/noimage.png"
+        const val TEMP_FAVICON_URL_BASE = "https://www.google.com/s2/favicons?domain="
     }
 }
 
@@ -84,6 +91,10 @@ data class EntryItem(
 
     override val count : Int,
 
+    @SerialName("date")
+    @Serializable(with = InstantISO8601Serializer::class)
+    override val createdAt : Instant,
+
     @SerialName("entry_url")
     override val _entryUrl : String? = null,
 
@@ -102,10 +113,6 @@ data class EntryItem(
     // ユーザーがブクマしている場合のみ取得
     @SerialName("bookmarked_data")
     override val bookmarkedData : BookmarkResult? = null,
-
-    @SerialName("date")
-    @Serializable(with = InstantISO8601Serializer::class)
-    override val createdAt : Instant,
 
     @SerialName("image_l")
     val largeImage : ImageInfo? = null,
@@ -154,6 +161,10 @@ data class IssueEntry(
     @SerialName("total_bookmarks")
     override val count : Int,
 
+    @SerialName("created_at")
+    @Serializable(with = InstantISO8601Serializer::class)
+    override val createdAt : Instant,
+
     @SerialName("entry_url")
     override val _entryUrl : String? = null,
 
@@ -172,9 +183,5 @@ data class IssueEntry(
     // ユーザーがブクマしている場合のみ取得
     @SerialName("bookmarked_data")
     override val bookmarkedData : BookmarkResult? = null,
-
-    @SerialName("created_at")
-    @Serializable(with = InstantISO8601Serializer::class)
-    override val createdAt : Instant,
 
 ) : Entry()

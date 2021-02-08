@@ -83,6 +83,7 @@ class EntryServiceTest : AccountServiceTestCredentials() {
                     }
                 }
             }.onFailure { e ->
+                // `ALL`, `GENERAL`ではIssueが得られない
                 e.printStackTrace()
                 assert(
                     (it == Category.ALL || it == Category.GENERAL) &&

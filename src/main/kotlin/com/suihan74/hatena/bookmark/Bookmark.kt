@@ -10,7 +10,7 @@ import java.time.Instant
 @Serializable
 data class Bookmark(
     @SerialName("user")
-    private val mUser : User,
+    private val _user : User,
 
     val comment : String,
 
@@ -27,9 +27,9 @@ data class Bookmark(
     @SerialName("star_count")
     val starCount : List<StarCount>
 ) {
-    val user: String by lazy { mUser.name }
+    val user: String by lazy { _user.name }
 
-    val userIconUrl: String by lazy { mUser.profileImageUrl }
+    val userIconUrl: String by lazy { _user.profileImageUrl }
 
     // ------ //
 
