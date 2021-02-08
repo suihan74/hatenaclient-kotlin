@@ -103,8 +103,6 @@ class CertifiedAccountServiceImpl(delegate : CertifiedAccountService) : Certifie
                 }.onSuccess {
                     cursor = it.cursor
                     addAll(it.users)
-                }.onFailure {
-                    it.printStackTrace()
                 }
             } while (result.isSuccess && cursor != null)
         }
