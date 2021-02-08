@@ -1,11 +1,18 @@
 package com.suihan74.hatena.api
 
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.suihan74.hatena.account.IgnoredUsersResponse
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert
+import org.junit.Assert.fail
 import org.junit.Test
+import retrofit2.Retrofit
 
 /*
  * テストの実行にはテストユーザーの認証情報が必要になります
@@ -88,5 +95,68 @@ internal class AccountServiceTest : AccountServiceTestCredentials() {
         client.user.getIgnoredUsersAll().let { response ->
             printResult(response)
         }
+    }
+
+    @Test
+    fun getIgnoredUsersAll_fails_first_trial() = runBlocking {
+        val server = MockWebServer().apply {
+            enqueue(MockResponse().setResponseCode(404))
+        }
+        server.start()
+
+        val mockService = CertifiedAccountServiceImpl(Retrofit.Builder()
+            .baseUrl(server.url(""))
+            .addConverterFactory(
+                Json.asConverterFactory("application/json".toMediaType())
+            )
+            .client(OkHttpClient())
+            .build()
+            .create(CertifiedAccountService::class.java)
+        )
+
+        runCatching {
+            mockService.getIgnoredUsersAll()
+        }.onSuccess {
+            fail()
+        }.onFailure {
+            it.printStackTrace()
+        }
+
+        server.shutdown()
+    }
+
+    @Test
+    fun getIgnoredUsersAll_fails_on_the_way() = runBlocking {
+        val server = MockWebServer().apply {
+            enqueue(MockResponse().setResponseCode(200).setBody("""
+                {"users":["test0","test1"],"cursor":"cursor0"}
+                """.trimIndent()))
+            enqueue(MockResponse().setResponseCode(404))
+            enqueue(MockResponse().setResponseCode(200).setBody("""
+                {"users":["test2","test3"],"cursor":null}
+                """.trimIndent()))
+        }
+        server.start()
+
+        val mockService = CertifiedAccountServiceImpl(Retrofit.Builder()
+            .baseUrl(server.url(""))
+            .addConverterFactory(
+                Json.asConverterFactory("application/json".toMediaType())
+            )
+            .client(OkHttpClient())
+            .build()
+            .create(CertifiedAccountService::class.java)
+        )
+
+        runCatching {
+            mockService.getIgnoredUsersAll()
+        }.onSuccess {
+            println(it.users)
+        }.onFailure {
+            it.printStackTrace()
+            fail()
+        }
+
+        server.shutdown()
     }
 }

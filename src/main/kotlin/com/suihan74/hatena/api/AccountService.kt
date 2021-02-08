@@ -16,6 +16,7 @@ interface AccountService {
      * @param name ユーザー名
      * @param password パスワード
      * @return 成功時: アカウント情報
+     * @throws retrofit2.HttpException 通信失敗
      */
     @FormUrlEncoded
     @POST("${HatenaClientBase.baseUrlW}login")
@@ -33,6 +34,8 @@ interface AccountService {
 interface CertifiedAccountService : AccountService {
     /**
      * アカウント情報を取得
+     *
+     * @throws retrofit2.HttpException 通信失敗
      */
     @GET("my.name")
     suspend fun getAccount() : Account
@@ -45,6 +48,7 @@ interface CertifiedAccountService : AccountService {
      * @param limit 最大取得件数。`null`, `0`, 負値はすべて`null`として扱われ，適当な件数と追加取得用のカーソルが返される
      * @param cursor 順次取得用カーソル
      * @return 非表示ユーザーリスト(公式設定ページの表示順)とカーソルを含んだレスポンス
+     * @throws retrofit2.HttpException 通信失敗
      */
     @GET("api/my/ignore_users")
     suspend fun getIgnoredUsers(
@@ -54,6 +58,8 @@ interface CertifiedAccountService : AccountService {
 
     /**
      * 非表示ユーザーリストを全件取得
+     *
+     * @throws retrofit2.HttpException 通信失敗
      */
     suspend fun getIgnoredUsersAll() : IgnoredUsersResponse
 
@@ -63,6 +69,7 @@ interface CertifiedAccountService : AccountService {
      * @param user 非表示にするユーザーID
      * @param accountName サインインしているアカウント名
      * @param rks アカウント名とrkクッキーに対応する認証情報rks
+     * @throws retrofit2.HttpException 通信失敗
      */
     @FormUrlEncoded
     @POST("{account}/api.ignore.json")
@@ -74,6 +81,8 @@ interface CertifiedAccountService : AccountService {
 
     /**
      * ユーザーを非表示にする
+     *
+     * @throws retrofit2.HttpException 通信失敗
      */
     suspend fun ignoreUser(user: String)
 }
@@ -91,7 +100,10 @@ class CertifiedAccountServiceImpl(delegate : CertifiedAccountService) : Certifie
     /**
      * 非表示ユーザーリスト全件取得(公式設定ページの表示順)
      *
-     * 途中で失敗した場合，最後に成功したところまでのリストとカーソルを返す
+     * @return 全件の非表示ユーザーリストを返す。
+     * 取得途中で失敗した場合，最後に成功したところまでのリストとカーソルを返す
+     *
+     * @throws retrofit2.HttpException "初回で"通信失敗して一件も取得できなかった場合送出
      */
     @OptIn(ExperimentalStdlibApi::class)
     override suspend fun getIgnoredUsersAll(): IgnoredUsersResponse {
@@ -103,6 +115,11 @@ class CertifiedAccountServiceImpl(delegate : CertifiedAccountService) : Certifie
                 }.onSuccess {
                     cursor = it.cursor
                     addAll(it.users)
+                }.onFailure {
+                    // 初回で失敗した場合は例外送出
+                    if (cursor == null) {
+                        throw it
+                    }
                 }
             } while (result.isSuccess && cursor != null)
         }
@@ -113,6 +130,8 @@ class CertifiedAccountServiceImpl(delegate : CertifiedAccountService) : Certifie
      * ユーザーを非表示にする
      *
      * @param user 非表示にするユーザーID
+     *
+     * @throws retrofit2.HttpException 通信失敗
      */
     override suspend fun ignoreUser(user: String) {
         __ignoreUser(user, accountName, rks)
