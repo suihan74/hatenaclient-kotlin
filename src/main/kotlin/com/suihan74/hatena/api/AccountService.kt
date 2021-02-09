@@ -63,6 +63,8 @@ interface CertifiedAccountService : AccountService {
      */
     suspend fun getIgnoredUsersAll() : IgnoredUsersResponse
 
+    // ------ //
+
     /**
      * ユーザーを非表示にする
      *
@@ -82,9 +84,39 @@ interface CertifiedAccountService : AccountService {
     /**
      * ユーザーを非表示にする
      *
+     * @param user 非表示を解除するユーザーID
+     * @param accountName サインインしているアカウント名
+     * @param rks アカウント名とrkクッキーに対応する認証情報rks
+     * @throws retrofit2.HttpException code=500: ユーザーが存在しない
+     * @throws retrofit2.HttpException 通信失敗
+     */
+    @FormUrlEncoded
+    @POST("{account}/api.unignore.json")
+    suspend fun __unIgnoreUser(
+        @Field("username") user: String,
+        @Path("account") accountName: String,
+        @Field("rks") rks: String
+    )
+
+    /**
+     * ユーザーを非表示にする
+     *
+     * 既に非表示設定済みでも成功する点には注意
+     *
+     * @throws retrofit2.HttpException code=500: ユーザーが存在しない
      * @throws retrofit2.HttpException 通信失敗
      */
     suspend fun ignoreUser(user: String)
+
+    /**
+     * ユーザーの非表示を解除する
+     *
+     * 既に非表示解除状態でも成功する点には注意
+     *
+     * @throws retrofit2.HttpException code=500: ユーザーが存在しない
+     * @throws retrofit2.HttpException 通信失敗
+     */
+    suspend fun unIgnoreUser(user: String)
 }
 
 /**
@@ -98,12 +130,7 @@ class CertifiedAccountServiceImpl(delegate : CertifiedAccountService) : Certifie
     // ------ //
 
     /**
-     * 非表示ユーザーリスト全件取得(公式設定ページの表示順)
-     *
-     * @return 全件の非表示ユーザーリストを返す。
-     * 取得途中で失敗した場合，最後に成功したところまでのリストとカーソルを返す
-     *
-     * @throws retrofit2.HttpException "初回で"通信失敗して一件も取得できなかった場合送出
+     * @see CertifiedAccountService.getIgnoredUsersAll
      */
     @OptIn(ExperimentalStdlibApi::class)
     override suspend fun getIgnoredUsersAll(): IgnoredUsersResponse {
@@ -127,13 +154,12 @@ class CertifiedAccountServiceImpl(delegate : CertifiedAccountService) : Certifie
     }
 
     /**
-     * ユーザーを非表示にする
-     *
-     * @param user 非表示にするユーザーID
-     *
-     * @throws retrofit2.HttpException 通信失敗
+     * @see CertifiedAccountService.ignoreUser
      */
-    override suspend fun ignoreUser(user: String) {
-        __ignoreUser(user, accountName, rks)
-    }
+    override suspend fun ignoreUser(user: String) = __ignoreUser(user, accountName, rks)
+
+    /**
+     * @see CertifiedAccountService.unIgnoreUser
+     */
+    override suspend fun unIgnoreUser(user: String) = __unIgnoreUser(user, accountName, rks)
 }

@@ -159,4 +159,26 @@ internal class AccountServiceTest : AccountServiceTestCredentials() {
 
         server.shutdown()
     }
+
+    @Test
+    fun ignoreUser_not_existed_user() = runBlocking {
+        val client = HatenaClient.signIn(rk)
+        runCatching {
+            client.user.ignoreUser("____unknownuser")
+        }.onFailure {
+            it.printStackTrace()
+        }.onSuccess {
+            fail()
+        }
+
+        runCatching {
+            client.user.unIgnoreUser("____unknownuser")
+        }.onFailure {
+            it.printStackTrace()
+        }.onSuccess {
+            fail()
+        }
+
+        return@runBlocking
+    }
 }
