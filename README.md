@@ -4,6 +4,41 @@ under development...
 
 This is a module for accessing Hatena Bookmark by using Kotlin.
 
+## How to use
+
+### Android Project
+
+#### build.gradle(:project)
+
+```gradle:build.gradle
+allprojects {
+    repositories {
+        // ...
+        // add
+        maven { url 'https://jitpack.io' }
+    }
+}
+```
+
+#### build.gradle(:app)
+
+```gradle
+dependencies {
+    // ...
+
+    // HatenaClient
+    implementation 'com.github.suihan74:HatenaClient-kotlin:0.0.2'
+    
+    // Coroutines
+    def coroutines_version = '1.4.2'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
+}
+```
+
+---
+
+## APIs
+
 ### Account
 
 #### Sign-in
