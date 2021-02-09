@@ -64,6 +64,20 @@ sealed class HatenaClientBase {
     protected val retrofitForBookmark by lazy { retrofitBuilder(baseUrlB).build() }
 
     protected val retrofitForStar by lazy { retrofitBuilder(baseUrlS).build() }
+
+    // ------ //
+
+    /**
+     * 指定URLのエントリURLを取得する
+     *
+     * @return "https://b.hatena.ne.jp/entry/..."
+     */
+    fun getEntryUrl(url: String) = buildString {
+        append(HatenaClientBase.baseUrlB, "entry/")
+        val schemeHttps = "https://"
+        if (url.startsWith(schemeHttps)) append("s/", url.substring(schemeHttps.length))
+        else append(url.substring(schemeHttps.length - 1))
+    }
 }
 
 // ------ //

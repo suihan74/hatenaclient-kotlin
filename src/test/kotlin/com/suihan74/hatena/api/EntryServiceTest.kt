@@ -6,6 +6,8 @@ import com.suihan74.hatena.entry.Issue
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.junit.Assert.assertEquals
+import org.junit.Assert.fail
 import org.junit.Test
 import retrofit2.HttpException
 
@@ -91,5 +93,28 @@ class EntryServiceTest : AccountServiceTestCredentials() {
                 )
             }
         }
+    }
+
+    @Test
+    fun getEntryId_success() = runBlocking {
+        val url = "https://anond.hatelabo.jp/20210127175952"
+        val id = HatenaClient.entry.getEntryId(url)
+        val expected = 4697656063361718818
+        assertEquals(expected, id)
+        println("eid = $id : $url")
+    }
+
+    @Test
+    fun getEntryId_not_existed() = runBlocking {
+        val url = "https://b.hatena.ne.jp/entry/s/b.hatena.ne.jp/entry/s/anond.hatelabo.jp/20210127175952"
+        runCatching {
+            val id = HatenaClient.entry.getEntryId(url)
+            println("eid = $id : $url")
+        }.onSuccess {
+            fail()
+        }.onFailure {
+            it.printStackTrace()
+        }
+        Unit
     }
 }

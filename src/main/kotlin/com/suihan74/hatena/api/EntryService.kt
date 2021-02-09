@@ -1,6 +1,7 @@
 package com.suihan74.hatena.api
 
 import com.suihan74.hatena.entry.*
+import com.suihan74.hatena.exception.InvalidResponseException
 import com.suihan74.hatena.extension.int
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -119,6 +120,24 @@ suspend fun EntryService.getEntries(
  */
 suspend fun EntryService.getIssues(category: Category) : List<Issue> =
     __getIssues(category.code).issues
+
+/**
+ * 指定ページのエントリIDを取得する
+ *
+ * @throws retrofit2.HttpException code=404: ブクマが一件も登録されていない
+ * @throws retrofit2.HttpException 通信失敗
+ * @throws InvalidResponseException レスポンスの処理に失敗
+ */
+@Suppress("BlockingMethodInNonBlockingContext")
+suspend fun EntryService.getEntryId(url: String) : Long {
+    val entryUrl = HatenaClient.getEntryUrl(url)
+    return HatenaClient.generalService.getHtml(entryUrl) { html ->
+        html.getElementsByTag("html")!!
+            .first()
+            .attr("data-entry-eid")
+            .toLong()
+    }
+}
 
 // ------ //
 

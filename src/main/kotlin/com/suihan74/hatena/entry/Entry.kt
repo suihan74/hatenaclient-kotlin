@@ -1,6 +1,6 @@
 package com.suihan74.hatena.entry
 
-import com.suihan74.hatena.api.HatenaClientBase
+import com.suihan74.hatena.api.HatenaClient
 import com.suihan74.hatena.bookmark.BookmarkResult
 import com.suihan74.hatena.bookmark.serializer.InstantISO8601Serializer
 import com.suihan74.hatena.star.StarCount
@@ -39,12 +39,7 @@ sealed class Entry {
     // --- //
 
     val entryUrl : String by lazy {
-        _entryUrl ?: buildString {
-            append(HatenaClientBase.baseUrlB, "entry/")
-            val schemeHttps = "https://"
-            if (url.startsWith(schemeHttps)) append("s/", url.substring(schemeHttps.length))
-            else append(url.substring(schemeHttps.length - 1))
-        }
+        _entryUrl ?: HatenaClient.getEntryUrl(url)
     }
 
     val rootUrl : String by lazy {
