@@ -106,6 +106,20 @@ object HatenaClient : HatenaClientBaseNoCertificationRequired() {
 
     /** Cookieを利用して再ログイン */
     override suspend fun signIn(rk: String) = CertifiedHatenaClient.createInstance(rk)
+
+    // ------ //
+
+    @OptIn(ExperimentalSerializationApi::class)
+    internal val generalService by lazy {
+        Retrofit.Builder()
+            .baseUrl("https://localhost/")
+            .addConverterFactory(
+                Json.asConverterFactory("application/json".toMediaType())
+            )
+            .client(okHttpClient)
+            .build()
+            .create(GeneralService::class.java)
+    }
 }
 
 // ------ //
