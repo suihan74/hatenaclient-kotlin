@@ -77,7 +77,7 @@ interface EntryService {
     @GET("api/ipad.search/{searchType}")
     suspend fun searchEntries(
         @Path("searchType") searchType: SearchType,
-        @Query("q", encoded = true) query: String,
+        @Query("q") query: String,
         @Query("sort") @EntriesTypeQuery(EntriesTypeUsage.SEARCH_SORT) sortType: EntriesType = EntriesType.RECENT,
         @Query("limit") limit: Int? = null,
         @Query("of") offset: Int? = null,
@@ -118,7 +118,7 @@ suspend fun EntryService.getUrl(eid: Long) : String {
         val entryUrl = response.raw().request.url.toString()
 
         val headHttps = "${baseUrl}entry/s/"
-//        val headHttp = "$baseUrl/entry/"
+//        val headHttp = "${baseUrl}entry/"
 
         val isHttps = entryUrl.startsWith(headHttps)
         val scheme =
