@@ -107,6 +107,7 @@ suspend fun EntryService.getEntryId(url: String) : Long {
  * エントリIDから対象のページのURLを取得する
  *
  * @param eid エントリID
+ * @return 対象ページのURL
  * @throws retrofit2.HttpException 通信失敗
  */
 suspend fun EntryService.getUrl(eid: Long) : String {
