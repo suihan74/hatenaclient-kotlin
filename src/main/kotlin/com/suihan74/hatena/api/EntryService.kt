@@ -2,6 +2,7 @@ package com.suihan74.hatena.api
 
 import com.suihan74.hatena.entry.*
 import com.suihan74.hatena.exception.InvalidResponseException
+import retrofit2.HttpException
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -89,11 +90,9 @@ interface EntryService {
 /**
  * 指定ページのエントリIDを取得する
  *
- * @throws retrofit2.HttpException code=404: ブクマが一件も登録されていない
  * @throws retrofit2.HttpException 通信失敗
  * @throws InvalidResponseException レスポンスの処理に失敗
  */
-@Suppress("BlockingMethodInNonBlockingContext")
 suspend fun EntryService.getEntryId(url: String) : Long {
     val entryUrl = HatenaClient.getEntryUrl(url)
     return HatenaClient.generalService.getHtml(entryUrl) { html ->
@@ -101,6 +100,35 @@ suspend fun EntryService.getEntryId(url: String) : Long {
             .first()
             .attr("data-entry-eid")
             .toLong()
+    }
+}
+
+/**
+ * エントリIDから対象のページのURLを取得する
+ *
+ * @param eid エントリID
+ * @throws retrofit2.HttpException 通信失敗
+ */
+suspend fun EntryService.getUrl(eid: Long) : String {
+    val baseUrl = HatenaClient.baseUrlB
+    val eidEntryUrl = buildString { append(baseUrl, "entry/", eid) }
+    return HatenaClient.generalService.get(eidEntryUrl).let { response ->
+        if (!response.isSuccessful) throw HttpException(response)
+        val entryUrl = response.raw().request.url.toString()
+
+        val headHttps = "${baseUrl}entry/s/"
+//        val headHttp = "$baseUrl/entry/"
+
+        val isHttps = entryUrl.startsWith(headHttps)
+        val scheme =
+            if (isHttps) "https://"
+            else "http://"
+        val tail = entryUrl.substring(
+            if (isHttps) headHttps.length
+            else headHttps.length - 2
+        )
+
+        "$scheme$tail"
     }
 }
 
@@ -115,6 +143,7 @@ interface CertifiedEntryService : EntryService {
      *
      * @param limit 最大件数
      * @param offset 取得開始位置
+     * @throws retrofit2.HttpException 通信失敗
      */
     @GET("api/ipad.mybookmarks")
     suspend fun getBookmarkedEntries(

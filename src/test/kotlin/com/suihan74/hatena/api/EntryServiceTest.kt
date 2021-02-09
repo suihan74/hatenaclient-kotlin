@@ -120,6 +120,14 @@ class EntryServiceTest : AccountServiceTestCredentials() {
     }
 
     @Test
+    fun getUrl() = runBlocking {
+        val eid = 4698022722211478562
+        val url = HatenaClient.entry.getUrl(eid)
+        val expected = "https://suihan74.github.io/posts/2021/02_04_00_satena_160/"
+        assertEquals(expected, url)
+    }
+
+    @Test
     fun searchEntries() = runBlocking {
         val entries = HatenaClient.entry.searchEntries(SearchType.TAG, "test", EntriesType.RECENT)
         entries.forEach {
