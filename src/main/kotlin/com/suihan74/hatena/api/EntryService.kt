@@ -19,7 +19,6 @@ interface EntryService {
      * @param offset 取得開始位置
      * @param includeAMPUrls AMP用のURLを含める
      * @param includeBookmarkedData 自分のブクマ情報を含める(サインイン済みの場合)
-     * @param includeBookmarksByVisitor
      * @param includeBookmarksOfFollowings フォローしているユーザーのブクマ情報を含める(サインイン済みの場合)
      * @param includeAds はてなから提供される広告を含める
      */
