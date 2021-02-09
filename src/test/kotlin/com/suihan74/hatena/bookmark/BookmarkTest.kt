@@ -2,7 +2,7 @@ package com.suihan74.hatena.bookmark
 
 import com.suihan74.hatena.star.StarColor
 import com.suihan74.hatena.star.StarCount
-import junit.framework.Assert.assertEquals
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.time.Instant
 

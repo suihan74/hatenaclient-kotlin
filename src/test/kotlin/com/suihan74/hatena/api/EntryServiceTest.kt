@@ -3,6 +3,7 @@ package com.suihan74.hatena.api
 import com.suihan74.hatena.entry.Category
 import com.suihan74.hatena.entry.EntriesType
 import com.suihan74.hatena.entry.Issue
+import com.suihan74.hatena.entry.SearchType
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -27,8 +28,8 @@ class EntryServiceTest : AccountServiceTestCredentials() {
     }
 
     private suspend fun getEntries(entriesType: EntriesType, issue: Issue) {
-        println("type = " + entriesType.name + " | category = " + issue.name)
-        HatenaClient.entry.getEntries(entriesType, issue).let { entries ->
+        println("type = " + entriesType.name + " | issue = " + issue.name)
+        HatenaClient.entry.getIssueEntries(entriesType, issue).entries.let { entries ->
             assert(entries.isNotEmpty())
             entries.forEach {
                 println(Json.encodeToString(it))
@@ -70,7 +71,7 @@ class EntryServiceTest : AccountServiceTestCredentials() {
         Category.values().forEach {
             println("===== " + it.name + " =====")
             runCatching {
-                HatenaClient.entry.getIssues(it).forEachIndexed { index, issue ->
+                HatenaClient.entry.getIssues(it).issues.forEachIndexed { index, issue ->
                     println(Json.encodeToString(issue))
                     issue.entry!!.let { entry ->
                         println("  entryUrl = " + entry.entryUrl)
@@ -116,5 +117,13 @@ class EntryServiceTest : AccountServiceTestCredentials() {
             it.printStackTrace()
         }
         Unit
+    }
+
+    @Test
+    fun searchEntries() = runBlocking {
+        val entries = HatenaClient.entry.searchEntries(SearchType.TAG, "test", EntriesType.RECENT)
+        entries.forEach {
+            println(it.title)
+        }
     }
 }

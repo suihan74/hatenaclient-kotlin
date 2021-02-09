@@ -33,7 +33,6 @@ class EntryTest {
     @Test
     fun rootUrl() {
         val url = "https://foo.bar.baz/hoge"
-        val rootUrl = "https://foo.bar.baz/"
         val expected = "https://foo.bar.baz/"
         val entry = EntryItem("", url, 0, "", 0, Instant.MIN)
         assertEquals(url, entry.url)
