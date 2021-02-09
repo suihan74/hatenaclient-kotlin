@@ -2,13 +2,9 @@ package com.suihan74.hatena.api
 
 import com.suihan74.hatena.entry.*
 import com.suihan74.hatena.exception.InvalidResponseException
-import com.suihan74.hatena.extension.int
-import retrofit2.Converter
-import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
-import java.lang.reflect.Type
 
 /**
  * エントリ関連のAPI
@@ -126,65 +122,4 @@ interface CertifiedEntryService : EntryService {
         @Query("limit") limit: Int? = null,
         @Query("of") offset: Int? = null
     ) : List<EntryItem>
-}
-
-
-// ------ //
-
-/**
- * (主に)クエリパラメータを文字列に変換するためのコンバータ
- */
-internal object EntryConverterFactory : Converter.Factory() {
-    override fun stringConverter(
-        type: Type,
-        annotations: Array<Annotation>,
-        retrofit: Retrofit
-    ): Converter<*, String>? =
-        when (type) {
-            Category::class.java -> CategoryConverter
-            SearchType::class.java -> SearchTypeConverter
-            EntriesType::class.java -> selectEntriesTypeConverter(annotations)
-            Issue::class.java -> IssueConverter
-            Boolean::class.java -> BooleanConverter
-            else -> null
-        }
-
-    private fun selectEntriesTypeConverter(annotations: Array<Annotation>) : Converter<EntriesType, String>? {
-        val type = annotations.firstOrNull { it is EntriesTypeQuery } as? EntriesTypeQuery
-        return when (type?.value) {
-            EntriesTypeUsage.ISSUE_ENTRIES -> EntriesTypeForIssueConverter
-            EntriesTypeUsage.SEARCH_SORT -> EntriesTypeForSearchConverter
-            else -> EntriesTypeConverter
-        }
-    }
-
-    // ------ //
-
-    internal object CategoryConverter : Converter<Category, String> {
-        override fun convert(value: Category) = value.code
-    }
-
-    internal object IssueConverter : Converter<Issue, String> {
-        override fun convert(value: Issue) = value.code
-    }
-
-    internal object SearchTypeConverter : Converter<SearchType, String> {
-        override fun convert(value: SearchType) = value.code
-    }
-
-    internal object EntriesTypeConverter : Converter<EntriesType, String> {
-        override fun convert(value: EntriesType) = value.code
-    }
-
-    internal object EntriesTypeForIssueConverter : Converter<EntriesType, String> {
-        override fun convert(value: EntriesType) = value.codeForIssues
-    }
-
-    internal object EntriesTypeForSearchConverter : Converter<EntriesType, String> {
-        override fun convert(value: EntriesType) = value.codeForSearch
-    }
-
-    internal object BooleanConverter : Converter<Boolean, String> {
-        override fun convert(value: Boolean) = value.int.toString()
-    }
 }

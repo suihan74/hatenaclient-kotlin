@@ -56,7 +56,7 @@ sealed class HatenaClientBase {
     protected fun retrofitBuilder(baseUrl: String) : Retrofit.Builder =
         Retrofit.Builder()
             .baseUrl(baseUrl)
-            .addConverterFactory(EntryConverterFactory)
+            .addConverterFactory(ObjectParameterConverterFactory)
             .addConverterFactory(
                 Json.asConverterFactory("application/json".toMediaType())
             )
