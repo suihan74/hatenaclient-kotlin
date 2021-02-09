@@ -167,7 +167,8 @@ class CertifiedHatenaClient internal constructor() : HatenaClientBase() {
     }
 
     /** サインインしているアカウント情報 */
-    private lateinit var accountName : String
+    lateinit var accountName : String
+        private set
 
     /** リクエストに加える認証情報 */
     private lateinit var rks : String

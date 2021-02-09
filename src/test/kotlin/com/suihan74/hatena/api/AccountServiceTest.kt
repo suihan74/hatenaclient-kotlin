@@ -28,6 +28,8 @@ abstract class AccountServiceTestCredentials {
 */
 
 internal class AccountServiceTest : AccountServiceTestCredentials() {
+    private val client = runBlocking { HatenaClient.signIn(rk) }
+
     @Test
     fun signIn() = runBlocking {
         // Basic認証
@@ -52,8 +54,6 @@ internal class AccountServiceTest : AccountServiceTestCredentials() {
 
     @Test
     fun getIgnoredUsers() = runBlocking {
-        val client = HatenaClient.signIn(rk)
-
         fun printResult(response: IgnoredUsersResponse) {
             assert(response.users.isNotEmpty())
             println("size = " + response.users.size + " | cursor = " + response.cursor)
@@ -85,8 +85,6 @@ internal class AccountServiceTest : AccountServiceTestCredentials() {
 
     @Test
     fun getIgnoredUsersAll() = runBlocking {
-        val client = HatenaClient.signIn(rk)
-
         fun printResult(response: IgnoredUsersResponse) {
             assert(response.users.isNotEmpty())
             println("size = " + response.users.size + " | cursor = " + response.cursor)
@@ -165,7 +163,6 @@ internal class AccountServiceTest : AccountServiceTestCredentials() {
 
     @Test
     fun ignoreUser_not_existed_user() = runBlocking {
-        val client = HatenaClient.signIn(rk)
         runCatching {
             client.user.ignoreUser("____unknownuser")
         }.onFailure {
@@ -183,5 +180,19 @@ internal class AccountServiceTest : AccountServiceTestCredentials() {
         }
 
         return@runBlocking
+    }
+
+    @Test
+    fun getFollowings() = runBlocking {
+        client.user.getFollowings(client.accountName).users.forEach {
+            println(it.name)
+        }
+    }
+
+    @Test
+    fun getFollowers() = runBlocking {
+        client.user.getFollowers(client.accountName).users.forEach {
+            println(it.user)
+        }
     }
 }

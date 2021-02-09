@@ -1,6 +1,8 @@
 package com.suihan74.hatena.api
 
 import com.suihan74.hatena.account.Account
+import com.suihan74.hatena.account.FollowersResponse
+import com.suihan74.hatena.account.FollowingsResponse
 import com.suihan74.hatena.account.IgnoredUsersResponse
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -24,6 +26,26 @@ interface AccountService {
         @Field("name") name: String,
         @Field("password") password: String
     ) : Response<ResponseBody>
+
+    /**
+     * 指定ユーザーがフォローしているユーザーリストを取得する
+     *
+     * @param user 対象ユーザーID
+     */
+    @GET("{user}/follow.json")
+    suspend fun getFollowings(
+        @Path("user") user: String
+    ) : FollowingsResponse
+
+    /**
+     * 指定ユーザーをフォローしているユーザーリストを取得する
+     *
+     * @param user 対象ユーザーID
+     */
+    @GET("api/internal/cambridge/user/{user}/followers")
+    suspend fun getFollowers(
+        @Path("user") user: String
+    ) : FollowersResponse
 }
 
 // ------ //
