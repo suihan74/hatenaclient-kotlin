@@ -16,7 +16,7 @@ suspend fun signIn() {
     val rkStr = certifiedClient.rkStr
 
     // 認証情報を使用して再サインイン
-    val signedClient2 = HatenaClient.signIn(rkStr)
+    val certifiedClient2 = HatenaClient.signIn(rkStr)
 }
 ```
 
