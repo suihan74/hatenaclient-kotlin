@@ -3,6 +3,7 @@ package com.suihan74.hatena.api
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.suihan74.hatena.account.IgnoredUsersResponse
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -97,6 +98,7 @@ internal class AccountServiceTest : AccountServiceTestCredentials() {
         }
     }
 
+    @OptIn(ExperimentalSerializationApi::class)
     @Test
     fun getIgnoredUsersAll_fails_first_trial() = runBlocking {
         val server = MockWebServer().apply {
@@ -125,6 +127,7 @@ internal class AccountServiceTest : AccountServiceTestCredentials() {
         server.shutdown()
     }
 
+    @OptIn(ExperimentalSerializationApi::class)
     @Test
     fun getIgnoredUsersAll_fails_on_the_way() = runBlocking {
         val server = MockWebServer().apply {
