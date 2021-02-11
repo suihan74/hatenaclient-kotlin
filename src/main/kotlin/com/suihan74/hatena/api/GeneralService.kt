@@ -6,7 +6,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import retrofit2.HttpException
+import com.suihan74.hatena.exception.HttpException
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Url
@@ -24,7 +24,7 @@ interface GeneralService {
  *
  * @param url
  * @param parser
- * @throws retrofit2.HttpException 通信失敗
+ * @throws HttpException 通信失敗
  * @throws InvalidResponseException レスポンスの処理に失敗
  */
 suspend fun <T> GeneralService.getHtml(

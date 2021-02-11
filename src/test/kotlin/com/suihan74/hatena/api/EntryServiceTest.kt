@@ -10,7 +10,7 @@ import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Test
-import retrofit2.HttpException
+import com.suihan74.hatena.exception.HttpException
 
 class EntryServiceTest : AccountServiceTestCredentials() {
     private suspend fun getEntries(entriesType: EntriesType, category: Category) {

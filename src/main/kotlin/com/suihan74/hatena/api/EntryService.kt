@@ -1,8 +1,8 @@
 package com.suihan74.hatena.api
 
 import com.suihan74.hatena.entry.*
+import com.suihan74.hatena.exception.HttpException
 import com.suihan74.hatena.exception.InvalidResponseException
-import retrofit2.HttpException
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -90,7 +90,7 @@ interface EntryService {
 /**
  * 指定ページのエントリIDを取得する
  *
- * @throws retrofit2.HttpException 通信失敗
+ * @throws HttpException 通信失敗
  * @throws InvalidResponseException レスポンスの処理に失敗
  */
 suspend fun EntryService.getEntryId(url: String) : Long {
@@ -108,7 +108,7 @@ suspend fun EntryService.getEntryId(url: String) : Long {
  *
  * @param eid エントリID
  * @return 対象ページのURL
- * @throws retrofit2.HttpException 通信失敗
+ * @throws HttpException 通信失敗
  */
 suspend fun EntryService.getUrl(eid: Long) : String {
     val baseUrl = HatenaClient.baseUrlB
@@ -144,7 +144,7 @@ interface CertifiedEntryService : EntryService {
      *
      * @param limit 最大件数
      * @param offset 取得開始位置
-     * @throws retrofit2.HttpException 通信失敗
+     * @throws HttpException 通信失敗
      */
     @GET("api/ipad.mybookmarks")
     suspend fun getBookmarkedEntries(

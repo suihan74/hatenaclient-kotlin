@@ -11,7 +11,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
-import retrofit2.HttpException
+import com.suihan74.hatena.exception.HttpException
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.mock.BehaviorDelegate

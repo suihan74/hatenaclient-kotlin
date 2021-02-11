@@ -18,7 +18,7 @@ interface AccountService {
      * @param name ユーザー名
      * @param password パスワード
      * @return 成功時: アカウント情報
-     * @throws retrofit2.HttpException 通信失敗
+     * @throws HttpException 通信失敗
      */
     @FormUrlEncoded
     @POST("${HatenaClientBase.baseUrlW}login")
@@ -57,7 +57,7 @@ interface CertifiedAccountService : AccountService {
     /**
      * アカウント情報を取得
      *
-     * @throws retrofit2.HttpException 通信失敗
+     * @throws HttpException 通信失敗
      */
     @GET("my.name")
     suspend fun getAccount() : Account
@@ -70,7 +70,7 @@ interface CertifiedAccountService : AccountService {
      * @param limit 最大取得件数。`null`, `0`, 負値はすべて`null`として扱われ，適当な件数と追加取得用のカーソルが返される
      * @param cursor 順次取得用カーソル
      * @return 非表示ユーザーリスト(公式設定ページの表示順)とカーソルを含んだレスポンス
-     * @throws retrofit2.HttpException 通信失敗
+     * @throws HttpException 通信失敗
      */
     @GET("api/my/ignore_users")
     suspend fun getIgnoredUsers(
@@ -81,7 +81,7 @@ interface CertifiedAccountService : AccountService {
     /**
      * 非表示ユーザーリストを全件取得
      *
-     * @throws retrofit2.HttpException 通信失敗
+     * @throws HttpException 通信失敗
      */
     suspend fun getIgnoredUsersAll() : IgnoredUsersResponse
 
@@ -93,7 +93,7 @@ interface CertifiedAccountService : AccountService {
      * @param user 非表示にするユーザーID
      * @param accountName サインインしているアカウント名
      * @param rks アカウント名とrkクッキーに対応する認証情報rks
-     * @throws retrofit2.HttpException 通信失敗
+     * @throws HttpException 通信失敗
      */
     @FormUrlEncoded
     @POST("{account}/api.ignore.json")
@@ -109,8 +109,8 @@ interface CertifiedAccountService : AccountService {
      * @param user 非表示を解除するユーザーID
      * @param accountName サインインしているアカウント名
      * @param rks アカウント名とrkクッキーに対応する認証情報rks
-     * @throws retrofit2.HttpException code=500: ユーザーが存在しない
-     * @throws retrofit2.HttpException 通信失敗
+     * @throws HttpException code=500: ユーザーが存在しない
+     * @throws HttpException 通信失敗
      */
     @FormUrlEncoded
     @POST("{account}/api.unignore.json")
@@ -125,8 +125,8 @@ interface CertifiedAccountService : AccountService {
      *
      * 既に非表示設定済みでも成功する点には注意
      *
-     * @throws retrofit2.HttpException code=500: ユーザーが存在しない
-     * @throws retrofit2.HttpException 通信失敗
+     * @throws HttpException code=500: ユーザーが存在しない
+     * @throws HttpException 通信失敗
      */
     suspend fun ignoreUser(user: String)
 
@@ -135,8 +135,8 @@ interface CertifiedAccountService : AccountService {
      *
      * 既に非表示解除状態でも成功する点には注意
      *
-     * @throws retrofit2.HttpException code=500: ユーザーが存在しない
-     * @throws retrofit2.HttpException 通信失敗
+     * @throws HttpException code=500: ユーザーが存在しない
+     * @throws HttpException 通信失敗
      */
     suspend fun unIgnoreUser(user: String)
 }
