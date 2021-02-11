@@ -1,5 +1,7 @@
 # HatenaClient-kotlin
 
+[![](https://jitpack.io/v/suihan74/HatenaClient-kotlin.svg)](https://jitpack.io/#suihan74/HatenaClient-kotlin)
+
 under development...
 
 This is a module for accessing Hatena Bookmark by using Kotlin.
