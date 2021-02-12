@@ -52,6 +52,9 @@ sealed class HatenaClientBase {
     /** エントリ関係のAPI */
     abstract val entry : EntryService
 
+    /** スター関係のAPI */
+    abstract val star : StarService
+
     @OptIn(ExperimentalSerializationApi::class)
     protected fun retrofitBuilder(baseUrl: String) : Retrofit.Builder =
         Retrofit.Builder()
@@ -102,6 +105,9 @@ abstract class HatenaClientBaseNoCertificationRequired : HatenaClientBase() {
 
     /** エントリ関係のAPI */
     override val entry : EntryService by lazy { retrofitForBookmark.create(EntryService::class.java) }
+
+    /** スター関係のAPI */
+    override val star : StarService by lazy { retrofitForStar.create(StarService::class.java) }
 
     // ------ //
 
@@ -195,6 +201,9 @@ class CertifiedHatenaClient internal constructor() : HatenaClientBase() {
 
     /** エントリ関係のAPI */
     override val entry : CertifiedEntryService by lazy { retrofitForBookmark.create(CertifiedEntryService::class.java) }
+
+    /** スター関係のAPI */
+    override val star : StarService by lazy { retrofitForStar.create(StarService::class.java) }
 
     // ------ //
 
