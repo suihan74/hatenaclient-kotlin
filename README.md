@@ -145,3 +145,23 @@ suspend fun bookmarks() {
     val popularBookmarks = bookmarksDigest.scoredBookmarks
 }
 ```
+
+### Star
+
+#### Get Stars
+
+```kt
+suspend fun stars() {
+    val starsEntry = HatenaClient.star.getStarsEntry("url")
+    val stars = starsEntry.allStars
+    val yellowStars = starsEntry.stars
+    val coloredStars = starsEntry.coloredStars
+}
+
+suspend fun stars_multi_urls() {
+    val starsEntries = HatenaClient.star.getStarsEntries(listOf("url0", "url1", ...))
+    starsEntries.forEach { starsEntry ->
+        // ...
+    }
+}
+```
