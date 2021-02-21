@@ -2,6 +2,7 @@ package com.suihan74.hatena.api
 
 import com.suihan74.hatena.star.StarsEntriesResponse
 import com.suihan74.hatena.star.StarsEntry
+import com.suihan74.hatena.exception.HttpException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -61,7 +62,17 @@ interface CertifiedStarService : StarService {
 
     /**
      * 最近自分がつけたスターを取得する
+     *
+     * @throws HttpException 403: 自分以外のユーザー名が渡された場合
      */
     @GET("{userId}/stars.json")
     suspend fun __getMyRecentStars(userId: String) : List<StarsEntry>
+
+    /**
+     * 最近自分に対してつけられたスターを取得する
+     *
+     * @throws HttpException 403: 自分以外のユーザー名が渡された場合
+     */
+    @GET("{userId}/report.json")
+    suspend fun __getRecentStarsReport(userId: String) : List<StarsEntry>
 }
