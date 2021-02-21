@@ -29,7 +29,7 @@ dependencies {
     // ...
 
     // HatenaClient
-    implementation 'com.github.suihan74:HatenaClient-kotlin:0.0.2'
+    implementation 'com.github.suihan74:HatenaClient-kotlin:0.0.3'
     
     // Coroutines
     def coroutines_version = '1.4.2'
