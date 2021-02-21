@@ -41,7 +41,7 @@ dependencies {
 
 ## APIs
 
-### Account
+### User
 
 #### Sign-in
 
@@ -62,6 +62,16 @@ suspend fun signIn() {
 ```kt
 suspend fun account() {
     val account = certifiedClient.user.getAccount()
+}
+```
+
+#### Notice
+
+##### Get Notices
+
+```kt
+suspend fun getNotices() {
+    val response = certifiedClient.user.getNotices()
 }
 ```
 
@@ -165,3 +175,20 @@ suspend fun stars_multi_urls() {
     }
 }
 ```
+
+#### Get My Recent Stars
+
+```kt
+suspend fun getMyRecentStars() {
+    val starEntries = certifiedClient.star.getMyRecentStars()
+}
+```
+
+#### Get Recent Stars Report
+
+```kt
+suspend fun getRecentStarsReport() {
+    val starEntries = certifiedClient.star.getRecentStarsReport()
+}
+```
+
