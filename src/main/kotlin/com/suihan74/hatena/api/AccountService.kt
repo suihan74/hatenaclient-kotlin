@@ -1,9 +1,6 @@
 package com.suihan74.hatena.api
 
-import com.suihan74.hatena.account.Account
-import com.suihan74.hatena.account.FollowersResponse
-import com.suihan74.hatena.account.FollowingsResponse
-import com.suihan74.hatena.account.IgnoredUsersResponse
+import com.suihan74.hatena.account.*
 import com.suihan74.hatena.exception.HttpException
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -62,6 +59,14 @@ interface CertifiedAccountService : AccountService {
      */
     @GET("my.name")
     suspend fun getAccount() : Account
+
+    // ------ //
+
+    /**
+     * 通知を取得する
+     */
+    @GET("${HatenaClientBase.baseUrlW}notify/api/pull")
+    suspend fun getNotices() : NoticesResponse
 
     // ------ //
 

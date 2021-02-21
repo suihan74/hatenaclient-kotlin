@@ -14,6 +14,9 @@ import org.junit.Assert
 import org.junit.Assert.fail
 import org.junit.Test
 import retrofit2.Retrofit
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 /*
  * テストの実行にはテストユーザーの認証情報が必要になります
@@ -193,6 +196,19 @@ internal class AccountServiceTest : AccountServiceTestCredentials() {
     fun getFollowers() = runBlocking {
         client.user.getFollowers(client.accountName).users.forEach {
             println(it.user)
+        }
+    }
+
+    @Test
+    fun getNotices() = runBlocking {
+        val response = client.user.getNotices()
+        println(response.status)
+        println(
+            LocalDateTime.ofInstant(response.lastSeen, ZoneId.systemDefault())
+                .format(DateTimeFormatter.ISO_DATE_TIME)
+        )
+        response.notices.forEach {
+            println(Json.encodeToString(it))
         }
     }
 }
