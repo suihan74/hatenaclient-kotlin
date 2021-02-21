@@ -4,6 +4,7 @@ import com.suihan74.hatena.account.Account
 import com.suihan74.hatena.account.FollowersResponse
 import com.suihan74.hatena.account.FollowingsResponse
 import com.suihan74.hatena.account.IgnoredUsersResponse
+import com.suihan74.hatena.exception.HttpException
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*

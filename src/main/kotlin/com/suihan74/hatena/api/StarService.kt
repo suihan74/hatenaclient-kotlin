@@ -8,6 +8,9 @@ import kotlinx.coroutines.coroutineScope
 import retrofit2.http.GET
 import retrofit2.http.Query
 
+/**
+ * スター関連のAPI
+ */
 interface StarService {
     /**
      * 指定URLにつけられたスターを取得する
@@ -42,4 +45,23 @@ suspend fun StarService.getStarsEntries(urls: List<String>) : List<StarsEntry> {
     }
     val responses = tasks.awaitAll()
     return responses.flatMap { it.entries }
+}
+
+// ------ //
+
+/**
+ * 認証が必要なスター関連のAPI
+ */
+interface CertifiedStarService : StarService {
+    /**
+     * スターAPI用のrks取得
+     */
+    @GET("entries.json")
+    suspend fun __getCredential() : StarsEntriesResponse
+
+    /**
+     * 最近自分がつけたスターを取得する
+     */
+    @GET("{userId}/stars.json")
+    suspend fun __getMyRecentStars(userId: String) : List<StarsEntry>
 }

@@ -3,13 +3,14 @@ package com.suihan74.hatena.api
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import org.junit.Test
 import retrofit2.Retrofit
 
-class StarServiceTest {
+class StarServiceTest : AccountServiceTestCredentials() {
     @OptIn(ExperimentalSerializationApi::class)
     private val service = Retrofit.Builder()
         .baseUrl(HatenaClient.baseUrlS)
@@ -44,5 +45,12 @@ class StarServiceTest {
                 println(it.user + " : " + it.color.name + "(" + it.count + ")")
             }
         }
+    }
+
+    @Test
+    fun signInStar() = runBlocking {
+        val client = runBlocking { HatenaClient.signIn(rk) }
+        val response = client.star.__getCredential()
+        println(Json.encodeToString(response))
     }
 }

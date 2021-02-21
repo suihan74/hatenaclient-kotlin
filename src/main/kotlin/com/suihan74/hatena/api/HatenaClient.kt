@@ -203,7 +203,7 @@ class CertifiedHatenaClient internal constructor() : HatenaClientBase() {
     override val entry : CertifiedEntryService by lazy { retrofitForBookmark.create(CertifiedEntryService::class.java) }
 
     /** スター関係のAPI */
-    override val star : StarService by lazy { retrofitForStar.create(StarService::class.java) }
+    override val star : CertifiedStarService by lazy { retrofitForStar.create(CertifiedStarService::class.java) }
 
     // ------ //
 
