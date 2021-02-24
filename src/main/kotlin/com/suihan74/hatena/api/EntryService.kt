@@ -7,7 +7,6 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 import java.net.URLEncoder
-import java.nio.charset.Charset
 
 /**
  * エントリ関連のAPI
@@ -87,8 +86,6 @@ interface EntryService {
     ) : List<EntryItem>
 }
 
-// ------ //
-
 /**
  * 指定ページのエントリIDを取得する
  *
@@ -118,10 +115,7 @@ suspend fun EntryService.getUrl(eid: Long) : String {
     return HatenaClient.generalService.get(eidEntryUrl).let { response ->
         if (!response.isSuccessful) throw HttpException(response)
         val entryUrl = response.raw().request.url.toString()
-
         val headHttps = "${baseUrl}entry/s/"
-//        val headHttp = "${baseUrl}entry/"
-
         val isHttps = entryUrl.startsWith(headHttps)
         val scheme =
             if (isHttps) "https://"

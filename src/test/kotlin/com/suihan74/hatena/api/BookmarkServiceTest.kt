@@ -157,4 +157,95 @@ internal class BookmarkServiceTest {
             }
         }
     }
+
+    @Test
+    fun getBookmarksCount() = runBlocking {
+        val count = HatenaClient.bookmark.getBookmarksCount("https://suihan74.github.io/posts/2021/02_04_00_satena_160/")
+        assertEquals(1, count)
+    }
+
+    @Test
+    fun getBookmarksCount_multiUrls() = runBlocking {
+        val map = HatenaClient.bookmark.getBookmarksCount(listOf(
+            "https://suihan74.github.io/",
+            "https://suihan74.github.io/posts/2021/02_04_00_satena_160/"
+        ))
+        assertEquals(0, map["https://suihan74.github.io/"])
+        assertEquals(1, map["https://suihan74.github.io/posts/2021/02_04_00_satena_160/"])
+    }
+
+    @OptIn(ExperimentalStdlibApi::class)
+    @Test
+    fun getBookmarksCount_distinct() = runBlocking {
+        val urls = buildList {
+            repeat (100) {
+                add("https://localhost/")
+            }
+        }
+        val map = HatenaClient.bookmark.getBookmarksCount(urls)
+        assertEquals(1, map.size)
+        println(map[urls[0]])
+    }
+    
+    @Test
+    fun getBookmarksCount_manyUrls() = runBlocking { 
+        val urls = listOf(
+            "http://blog.father.gedow.net/2012/10/23/linux-command-for-trouble",
+            "http://blog.livedoor.jp/kensuu/archives/50785541.html",
+            "http://chaos2ch.com/archives/2586693.html",
+            "http://css-happylife.com/archives/2007/0115_1345.php",
+            "http://edu-dev.net/2012/09/20/ted_7sites/",
+            "http://hiroki-tkg.com/?p=452",
+            "http://kachibito.net/web-service/twitter/165-twitter-tools.html",
+            "http://problem-solver.hateblo.jp/entry/20070312/1173628642",
+            "http://rajic.2chblog.jp/archives/51860823.html",
+            "http://rajic.2chblog.jp/archives/51950856.html",
+            "http://sago.livedoor.biz/archives/50251034.html",
+            "http://www.bookscan.co.jp/",
+            "http://www.checkpad.jp/",
+            "http://www.earthinus.com/2011/06/simple-writing.html",
+            "http://www.fx2ch.net/archives/36182537.html",
+            "http://www.lastday.jp/2010/11/22/objective-c",
+            "http://www.mtblue.org/pc/tips/speed_up_xp.php",
+            "http://www.takke.jp/",
+            "https://221b.jp/",
+            "https://anond.hatelabo.jp/20090401200113",
+            "https://anond.hatelabo.jp/20091026215137",
+            "https://anond.hatelabo.jp/20110825105018",
+            "https://anond.hatelabo.jp/20130809115823",
+            "https://blog.mirakui.com/entry/20091230/1262158458",
+            "https://blog.sixapart.jp/2013-04/nine-moments.html",
+            "https://commte.net//archives/3433",
+            "https://e0166nt.com/blog-entry-213.html",
+            "https://gigazine.net/news/20060415_firefoxthunderbird/",
+            "https://glassonion.hatenablog.com/entry/20100802/1280758789",
+            "https://jbpress.ismedia.jp/articles/-/34428",
+            "https://jp.techcrunch.com/",
+            "https://keisan.casio.jp/",
+            "https://komoko.hatenablog.com/entry/20110524/p1",
+            "https://pixlr.com/editor/",
+            "https://portalshit.net/2014/12/11/thought-on-own-house",
+            "https://qiita.com/hirokidaichi/items/591ad96ab12938878fe1",
+            "https://ushigyu.net/2012/07/05/list_of_sites_to_think_about_domestic_travel/",
+            "https://www.cheap-delicious.com/entry/2014/10/14/170133",
+            "https://www.colordic.org/",
+            "https://www.colourlovers.com/",
+            "https://www.designwalker.com/2008/12/free-stock.html",
+            "https://www.furomuda.com/entry/20080410/1207806673",
+            "https://www.insource.co.jp/businessbunsho/houkoku_by_insource.html",
+            "https://www.itmedia.co.jp/bizid/articles/0607/24/news034.html",
+            "https://www.mdn.co.jp/di/",
+            "https://www.msng.info/archives/2010/11/happy_mac_apps_for_ex_windows_users.php",
+            "https://www.rarejob.com/",
+            "https://www.slideshare.net/",
+            "https://www.slideshare.net/yuka2py/javascript-23768378",
+            "https://www.slideshare.net/yutamorishige50/ss-41321443"
+        )
+        println("urls size = ${urls.size}")
+        val map = HatenaClient.bookmark.getBookmarksCount(urls)
+        assertEquals(urls.size, map.size)
+        urls.forEach {
+            println(it + " : " + map[it])
+        }
+    }
 }
