@@ -1,7 +1,7 @@
 package com.suihan74.hatena.bookmark
 
 import com.suihan74.hatena.serializer.BooleanAsBinarySerializer
-import com.suihan74.hatena.bookmark.serializer.EpochTimeSerializer
+import com.suihan74.hatena.serializer.EpochTimeSerializer
 import com.suihan74.hatena.star.Star
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

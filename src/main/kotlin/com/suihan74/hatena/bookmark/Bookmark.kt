@@ -1,6 +1,6 @@
 package com.suihan74.hatena.bookmark
 
-import com.suihan74.hatena.bookmark.serializer.InstantISO8601Serializer
+import com.suihan74.hatena.serializer.InstantISO8601Serializer
 import com.suihan74.hatena.star.StarCount
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

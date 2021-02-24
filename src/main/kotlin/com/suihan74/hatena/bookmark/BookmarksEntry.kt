@@ -1,6 +1,6 @@
 package com.suihan74.hatena.bookmark
 
-import com.suihan74.hatena.bookmark.serializer.BookmarksEntryTimestampSerializer
+import com.suihan74.hatena.serializer.BookmarksEntryTimestampSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.time.Instant

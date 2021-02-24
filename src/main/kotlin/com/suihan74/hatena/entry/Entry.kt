@@ -2,7 +2,7 @@ package com.suihan74.hatena.entry
 
 import com.suihan74.hatena.api.HatenaClient
 import com.suihan74.hatena.bookmark.BookmarkResult
-import com.suihan74.hatena.bookmark.serializer.InstantISO8601Serializer
+import com.suihan74.hatena.serializer.InstantISO8601Serializer
 import com.suihan74.hatena.star.StarCount
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

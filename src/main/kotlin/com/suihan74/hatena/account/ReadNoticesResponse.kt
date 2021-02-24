@@ -1,6 +1,6 @@
 package com.suihan74.hatena.account
 
-import com.suihan74.hatena.bookmark.serializer.EpochTimeSerializer
+import com.suihan74.hatena.serializer.EpochTimeSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.time.Instant

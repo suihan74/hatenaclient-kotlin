@@ -1,6 +1,5 @@
 package com.suihan74.hatena.serializer
 
-import com.suihan74.hatena.bookmark.serializer.InstantISO8601Serializer
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
