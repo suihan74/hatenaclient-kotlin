@@ -53,7 +53,7 @@ data class StarsEntry(
      */
     fun starsCount(color: StarColor) : Int = when (color) {
         StarColor.YELLOW -> stars.sumBy { it.count }
-        else -> coloredStars.first { it.color == color }.starsCount
+        else -> coloredStars.firstOrNull { it.color == color }?.starsCount ?: 0
     }
 }
 

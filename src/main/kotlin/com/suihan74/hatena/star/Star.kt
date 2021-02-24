@@ -8,7 +8,7 @@ data class Star(
     @SerialName("name")
     val user: String,
 
-    val quote: String,
+    val quote: String = "",
 
     val count: Int = 1,
 
