@@ -4,13 +4,13 @@ import com.suihan74.hatena.entry.Category
 import com.suihan74.hatena.entry.EntriesType
 import com.suihan74.hatena.entry.Issue
 import com.suihan74.hatena.entry.SearchType
+import com.suihan74.hatena.exception.HttpException
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Test
-import com.suihan74.hatena.exception.HttpException
 
 class EntryServiceTest : AccountServiceTestCredentials() {
     private suspend fun getEntries(entriesType: EntriesType, category: Category) {
@@ -125,6 +125,21 @@ class EntryServiceTest : AccountServiceTestCredentials() {
         val url = HatenaClient.entry.getUrl(eid)
         val expected = "https://suihan74.github.io/posts/2021/02_04_00_satena_160/"
         assertEquals(expected, url)
+    }
+
+    @Test
+    fun getFaviconUrl() {
+        val url = HatenaClient.entry.getFaviconUrl("https://suihan74.github.io/posts/2021/02_04_00_satena_160/")
+        assertEquals(
+            "https://cdn-ak2.favicon.st-hatena.com/?url=https%3A%2F%2Fsuihan74.github.io%2Fposts%2F2021%2F02_04_00_satena_160%2F",
+            url
+        )
+
+        val url2 = HatenaClient.entry.getFaviconUrl("https://hoge.com/ほげ")
+        assertEquals(
+            "https://cdn-ak2.favicon.st-hatena.com/?url=https%3A%2F%2Fhoge.com%2F%E3%81%BB%E3%81%92",
+            url2
+        )
     }
 
     @Test

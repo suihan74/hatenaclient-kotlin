@@ -46,6 +46,12 @@ interface AccountService {
     ) : FollowersResponse
 }
 
+/**
+ * ユーザーのアイコンURLを取得する
+ */
+fun AccountService.getUserIconUrl(user: String) : String =
+    "https://cdn1.www.st-hatena.com/users/$user/profile.gif"
+
 // ------ //
 
 /**

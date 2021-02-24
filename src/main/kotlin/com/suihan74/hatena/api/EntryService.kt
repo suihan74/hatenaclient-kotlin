@@ -6,6 +6,8 @@ import com.suihan74.hatena.exception.InvalidResponseException
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import java.net.URLEncoder
+import java.nio.charset.Charset
 
 /**
  * エントリ関連のAPI
@@ -132,6 +134,14 @@ suspend fun EntryService.getUrl(eid: Long) : String {
         "$scheme$tail"
     }
 }
+
+/**
+ * 与えられたページのfaviconのURLを取得する
+ *
+ * @return faviconのURL(実際にはてながキャッシュしていて画像が取得できるかは考慮しない)
+ */
+fun EntryService.getFaviconUrl(url: String) : String =
+    "https://cdn-ak2.favicon.st-hatena.com/?url=${URLEncoder.encode(url, Charset.forName("UTF-8"))}"
 
 // ------ //
 

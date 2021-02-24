@@ -11,6 +11,7 @@ import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Test
 import retrofit2.Retrofit
@@ -221,5 +222,11 @@ internal class AccountServiceTest : AccountServiceTestCredentials() {
             response.lastSeen.atOffset(ZoneOffset.ofHours(9))
             .format(DateTimeFormatter.ISO_DATE_TIME)
         )
+    }
+
+    @Test
+    fun getUserIconUrl() {
+        val url = HatenaClient.user.getUserIconUrl("suihan74")
+        assertEquals("https://cdn1.www.st-hatena.com/users/suihan74/profile.gif", url)
     }
 }
