@@ -141,7 +141,7 @@ suspend fun EntryService.getUrl(eid: Long) : String {
  * @return faviconのURL(実際にはてながキャッシュしていて画像が取得できるかは考慮しない)
  */
 fun EntryService.getFaviconUrl(url: String) : String =
-    "https://cdn-ak2.favicon.st-hatena.com/?url=${URLEncoder.encode(url, Charset.forName("UTF-8"))}"
+    "https://cdn-ak2.favicon.st-hatena.com/?url=${URLEncoder.encode(url, "UTF-8")}"
 
 // ------ //
 
