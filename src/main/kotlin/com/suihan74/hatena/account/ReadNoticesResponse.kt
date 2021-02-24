@@ -6,12 +6,18 @@ import kotlinx.serialization.Serializable
 import java.time.Instant
 
 @Serializable
-data class NoticesResponse(
-    val status : String,
-
+data class ReadNoticesResponse(
+    /**
+     * 最後に通知確認した時刻
+     */
     @SerialName("last_seen")
     @Serializable(with = EpochTimeSerializer::class)
     val lastSeen : Instant,
 
-    val notices : List<Notice>
+    /**
+     * 成功時"ok"
+     *
+     * TODO: 失敗時何が入るか
+     */
+    val status : String
 )

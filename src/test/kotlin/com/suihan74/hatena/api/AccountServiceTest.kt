@@ -16,6 +16,7 @@ import org.junit.Test
 import retrofit2.Retrofit
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 /*
@@ -210,5 +211,15 @@ internal class AccountServiceTest : AccountServiceTestCredentials() {
         response.notices.forEach {
             println(Json.encodeToString(it))
         }
+    }
+
+    @Test
+    fun readNotices() = runBlocking {
+        val response = client.user.readNotices()
+        println("status = ${response.status}")
+        println("lastSeen = " +
+            response.lastSeen.atOffset(ZoneOffset.ofHours(9))
+            .format(DateTimeFormatter.ISO_DATE_TIME)
+        )
     }
 }

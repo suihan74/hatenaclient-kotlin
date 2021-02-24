@@ -68,6 +68,20 @@ interface CertifiedAccountService : AccountService {
     @GET("${HatenaClientBase.baseUrlW}notify/api/pull")
     suspend fun getNotices() : NoticesResponse
 
+    /**
+     * 通知最終確認時刻を更新する
+     */
+    @FormUrlEncoded
+    @POST("${HatenaClientBase.baseUrlW}notify/api/read")
+    suspend fun __readNotices(
+        @Field("url") rks: String
+    ) : ReadNoticesResponse
+
+    /**
+     * 通知最終確認時刻を更新する
+     */
+    suspend fun readNotices() : ReadNoticesResponse
+
     // ------ //
 
     /**
@@ -154,6 +168,15 @@ class CertifiedAccountServiceImpl(delegate : CertifiedAccountService) : Certifie
     internal lateinit var accountName : String
 
     internal lateinit var rks : String
+
+    // ------ //
+
+    /**
+     * @see CertifiedAccountService.readNotices
+     */
+    override suspend fun readNotices() : ReadNoticesResponse {
+        return __readNotices(rks)
+    }
 
     // ------ //
 
