@@ -58,6 +58,10 @@ fun AccountService.getUserIconUrl(user: String) : String =
  * 要認証のアカウント関係API
  */
 interface CertifiedAccountService : AccountService {
+    val accountName : String
+
+    val rks : String
+
     /**
      * アカウント情報を取得
      *
@@ -79,14 +83,9 @@ interface CertifiedAccountService : AccountService {
      */
     @FormUrlEncoded
     @POST("${HatenaClientBase.baseUrlW}notify/api/read")
-    suspend fun __readNotices(
-        @Field("url") rks: String
+    suspend fun readNotices(
+        @Field("url") rks: String = this.rks
     ) : ReadNoticesResponse
-
-    /**
-     * 通知最終確認時刻を更新する
-     */
-    suspend fun readNotices() : ReadNoticesResponse
 
     // ------ //
 
@@ -104,13 +103,6 @@ interface CertifiedAccountService : AccountService {
         @Query("cursor") cursor: String? = null
     ) : IgnoredUsersResponse
 
-    /**
-     * 非表示ユーザーリストを全件取得
-     *
-     * @throws HttpException 通信失敗
-     */
-    suspend fun getIgnoredUsersAll() : IgnoredUsersResponse
-
     // ------ //
 
     /**
@@ -123,10 +115,10 @@ interface CertifiedAccountService : AccountService {
      */
     @FormUrlEncoded
     @POST("{account}/api.ignore.json")
-    suspend fun __ignoreUser(
+    suspend fun ignoreUser(
         @Field("username") user: String,
-        @Path("account") accountName: String,
-        @Field("rks") rks: String
+        @Path("account") accountName: String = this.accountName,
+        @Field("rks") rks: String = this.rks
     )
 
     /**
@@ -140,83 +132,46 @@ interface CertifiedAccountService : AccountService {
      */
     @FormUrlEncoded
     @POST("{account}/api.unignore.json")
-    suspend fun __unIgnoreUser(
+    suspend fun unIgnoreUser(
         @Field("username") user: String,
-        @Path("account") accountName: String,
-        @Field("rks") rks: String
+        @Path("account") accountName: String = this.accountName,
+        @Field("rks") rks: String = this.rks
     )
-
-    /**
-     * ユーザーを非表示にする
-     *
-     * 既に非表示設定済みでも成功する点には注意
-     *
-     * @throws HttpException code=500: ユーザーが存在しない
-     * @throws HttpException 通信失敗
-     */
-    suspend fun ignoreUser(user: String)
-
-    /**
-     * ユーザーの非表示を解除する
-     *
-     * 既に非表示解除状態でも成功する点には注意
-     *
-     * @throws HttpException code=500: ユーザーが存在しない
-     * @throws HttpException 通信失敗
-     */
-    suspend fun unIgnoreUser(user: String)
 }
 
+// ------- //
+
+class CertifiedAccountServiceImpl(
+    delegate : CertifiedAccountService
+) : CertifiedAccountService by delegate {
+    override lateinit var accountName: String
+    override lateinit var rks: String
+}
+
+// ------- //
+
 /**
- * 外部向けのインターフェイスの実装部分
+ * 非表示ユーザーリストを全件取得
+ *
+ * @throws HttpException 通信失敗
  */
-class CertifiedAccountServiceImpl(delegate : CertifiedAccountService) : CertifiedAccountService by delegate {
-    internal lateinit var accountName : String
-
-    internal lateinit var rks : String
-
-    // ------ //
-
-    /**
-     * @see CertifiedAccountService.readNotices
-     */
-    override suspend fun readNotices() : ReadNoticesResponse {
-        return __readNotices(rks)
-    }
-
-    // ------ //
-
-    /**
-     * @see CertifiedAccountService.getIgnoredUsersAll
-     */
-    @OptIn(ExperimentalStdlibApi::class)
-    override suspend fun getIgnoredUsersAll(): IgnoredUsersResponse {
-        var cursor: String? = null
-        val users = buildList {
-            do {
-                val result = runCatching {
-                    getIgnoredUsers(limit = null, cursor = cursor)
-                }.onSuccess {
-                    cursor = it.cursor
-                    addAll(it.users)
-                }.onFailure {
-                    // 初回で失敗した場合は例外送出
-                    if (cursor == null) {
-                        throw it
-                    }
+@OptIn(ExperimentalStdlibApi::class)
+suspend fun CertifiedAccountService.getIgnoredUsersAll() : IgnoredUsersResponse {
+    var cursor: String? = null
+    val users = buildList {
+        do {
+            val result = runCatching {
+                getIgnoredUsers(limit = null, cursor = cursor)
+            }.onSuccess {
+                cursor = it.cursor
+                addAll(it.users)
+            }.onFailure {
+                // 初回で失敗した場合は例外送出
+                if (cursor == null) {
+                    throw it
                 }
-            } while (result.isSuccess && cursor != null)
-        }
-        return IgnoredUsersResponse(users = users, cursor = cursor)
+            }
+        } while (result.isSuccess && cursor != null)
     }
-
-    /**
-     * @see CertifiedAccountService.ignoreUser
-     */
-    override suspend fun ignoreUser(user: String) = __ignoreUser(user, accountName, rks)
-
-    /**
-     * @see CertifiedAccountService.unIgnoreUser
-     */
-    override suspend fun unIgnoreUser(user: String) = __unIgnoreUser(user, accountName, rks)
+    return IgnoredUsersResponse(users = users, cursor = cursor)
 }
