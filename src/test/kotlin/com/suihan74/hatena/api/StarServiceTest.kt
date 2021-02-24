@@ -49,8 +49,26 @@ class StarServiceTest : AccountServiceTestCredentials() {
 
     @Test
     fun signInStar() = runBlocking {
-        val client = runBlocking { HatenaClient.signIn(rk) }
+        val client = HatenaClient.signIn(rk)
         val response = client.star.__getCredential()
         println(Json.encodeToString(response))
+    }
+
+    @Test
+    fun getMyRecentStars() = runBlocking {
+        val client = HatenaClient.signIn(rk)
+        val entries = client.star.getMyRecentStars()
+        entries.forEach {
+            println(Json.encodeToString(it))
+        }
+    }
+
+    @Test
+    fun getRecentStarsReport() = runBlocking {
+        val client = HatenaClient.signIn(rk)
+        val response = client.star.getRecentStarsReport()
+        response.entries.forEach {
+            println(Json.encodeToString(it))
+        }
     }
 }

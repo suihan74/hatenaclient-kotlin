@@ -187,6 +187,9 @@ class CertifiedHatenaClient internal constructor() : HatenaClientBase() {
             it.accountName = accountName
             it.rks = rks
         }
+        (star as CertifiedStarServiceImpl).let {
+            it.accountName = accountName
+        }
     }
 
     // ------ //
@@ -203,7 +206,9 @@ class CertifiedHatenaClient internal constructor() : HatenaClientBase() {
     override val entry : CertifiedEntryService by lazy { retrofitForBookmark.create(CertifiedEntryService::class.java) }
 
     /** スター関係のAPI */
-    override val star : CertifiedStarService by lazy { retrofitForStar.create(CertifiedStarService::class.java) }
+    override val star : CertifiedStarService by lazy {
+        CertifiedStarServiceImpl(retrofitForStar.create(CertifiedStarService::class.java))
+    }
 
     // ------ //
 

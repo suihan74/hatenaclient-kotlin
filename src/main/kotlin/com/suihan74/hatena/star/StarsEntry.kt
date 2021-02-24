@@ -68,7 +68,7 @@ data class StarsEntriesResponse(
 
     @SerialName("can_comment")
     @Serializable(with = BooleanAsBinarySerializer::class)
-    val canComment : Boolean,
+    val canComment : Boolean = false,
 
     /** (調査中) */
     val comments : List<String> = emptyList(),
