@@ -3,9 +3,11 @@ package com.suihan74.hatena.api
 import com.suihan74.hatena.entry.*
 import com.suihan74.hatena.exception.HttpException
 import com.suihan74.hatena.exception.InvalidResponseException
+import com.suihan74.hatena.extension.queryParameters
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import java.net.URI
 import java.net.URLEncoder
 
 /**
@@ -87,6 +89,15 @@ interface EntryService {
 }
 
 /**
+ * 与えられたページのfaviconのURLを取得する
+ *
+ * @return faviconのURL(実際にはてながキャッシュしていて画像が取得できるかは考慮しない)
+ */
+fun EntryService.getFaviconUrl(url: String) : String =
+    "https://cdn-ak2.favicon.st-hatena.com/?url=${URLEncoder.encode(url, "UTF-8")}"
+
+
+/**
  * 指定ページのエントリIDを取得する
  *
  * @throws HttpException 通信失敗
@@ -130,12 +141,47 @@ suspend fun EntryService.getUrl(eid: Long) : String {
 }
 
 /**
- * 与えられたページのfaviconのURLを取得する
+ * ブコメページのURLからエントリのURLを取得する
  *
- * @return faviconのURL(実際にはてながキャッシュしていて画像が取得できるかは考慮しない)
+ * e.g.)
+ * 1) https://b.hatena.ne.jp/entry/s/www.hoge.com/ ==> https://www.hoge.com/
+ * 2) https://b.hatena.ne.jp/entry/https://www.hoge.com/ ==> https://www.hoge.com/
+ * 3) https://b.hatena.ne.jp/entry/{eid}/comment/{username} ==> https://b.hatena.ne.jp/entry/{eid}
+ * 4) https://b.hatena.ne.jp/entry?url=https~~~
+ * 5) https://b.hatena.ne.jp/entry?eid=1234
+ * 6) https://b.hatena.ne.jp/entry/{eid}
+ *
+ * @throws IllegalArgumentException 渡されたurlがエントリURLとして判別不可能
  */
-fun EntryService.getFaviconUrl(url: String) : String =
-    "https://cdn-ak2.favicon.st-hatena.com/?url=${URLEncoder.encode(url, "UTF-8")}"
+fun EntryService.getUrlFromEntryUrl(entryUrl: String) : String {
+    if (entryUrl.startsWith("${HatenaClientBase.baseUrlB}entry?url=")) {
+        // 4)
+        return URI.create(entryUrl).queryParameters["url"] ?: throw IllegalArgumentException("invalid comment page url: $entryUrl")
+    }
+    else if (entryUrl.startsWith("${HatenaClientBase.baseUrlB}entry?eid=")) {
+        // 5)
+        val eid = URI.create(entryUrl).queryParameters["eid"] ?: throw IllegalArgumentException("invalid comment page url: $entryUrl")
+        return "${HatenaClientBase.baseUrlB}entry/$eid"
+    }
+
+    val commentUrlRegex = Regex("""https?://b\.hatena\.ne\.jp/entry/(\d+)(/comment/\w+)?""")
+    val commentUrlMatch = commentUrlRegex.matchEntire(entryUrl)
+    if (commentUrlMatch != null) {
+        // 3, 6)
+        return "${HatenaClientBase.baseUrlB}entry/${commentUrlMatch.groups[1]!!.value}"
+    }
+
+    val regex = Regex("""https?://b\.hatena\.ne\.jp/entry/(https://|s/)?(.+)""")
+    val matches = regex.matchEntire(entryUrl) ?: throw IllegalArgumentException("invalid comment page url: $entryUrl")
+    val path = matches.groups[2]?.value ?: throw IllegalArgumentException("invalid comment page url: $entryUrl")
+
+    // 1,2)
+    return if (matches.groups[1]?.value.isNullOrEmpty()) {
+        if (path.startsWith("http://")) path // 2)
+        else "http://$path" // 1)
+    }
+    else "https://$path"
+}
 
 // ------ //
 
