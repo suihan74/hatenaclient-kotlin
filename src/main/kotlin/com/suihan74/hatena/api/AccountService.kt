@@ -141,9 +141,7 @@ interface CertifiedAccountService : AccountService {
 
 // ------- //
 
-class CertifiedAccountServiceImpl(
-    delegate : CertifiedAccountService
-) : CertifiedAccountService by delegate {
+class CertifiedAccountServiceImpl(delegate : CertifiedAccountService) : CertifiedAccountService by delegate {
     override lateinit var accountName: String
     override lateinit var rks: String
 }

@@ -187,6 +187,10 @@ class CertifiedHatenaClient internal constructor() : HatenaClientBase() {
             it.accountName = accountName
             it.rks = rks
         }
+        (bookmark as CertifiedBookmarkServiceImpl).let {
+            it.accountName = accountName
+            it.rks = rks
+        }
         (star as CertifiedStarServiceImpl).let {
             it.accountName = accountName
         }
@@ -200,7 +204,9 @@ class CertifiedHatenaClient internal constructor() : HatenaClientBase() {
     }
 
     /** ブクマ関係のAPI */
-    override val bookmark : BookmarkService by lazy { retrofitForBookmark.create(BookmarkService::class.java) }
+    override val bookmark : CertifiedBookmarkService by lazy {
+        CertifiedBookmarkServiceImpl(retrofitForBookmark.create(CertifiedBookmarkService::class.java))
+    }
 
     /** エントリ関係のAPI */
     override val entry : CertifiedEntryService by lazy { retrofitForBookmark.create(CertifiedEntryService::class.java) }

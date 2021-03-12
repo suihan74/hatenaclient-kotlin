@@ -1,5 +1,6 @@
 package com.suihan74.hatena.api
 
+import com.suihan74.hatena.bookmark.BookmarkResult
 import com.suihan74.hatena.bookmark.BookmarksDigest
 import com.suihan74.hatena.bookmark.BookmarksEntry
 import com.suihan74.hatena.bookmark.BookmarksResponse
@@ -7,11 +8,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import retrofit2.http.GET
-import retrofit2.http.Query
+import retrofit2.http.*
 
 /**
- * ブクマ関係のAPI
+ * ブックマーク関係のAPI
  */
 interface BookmarkService {
     /**
@@ -86,3 +86,82 @@ suspend fun BookmarkService.getBookmarksCount(url: String) : Int {
     val map = __getBookmarksCount(listOf(url))
     return map[url] ?: 0
 }
+
+// ------ //
+
+/**
+ * 認証が必要なブックマーク関係API
+ */
+interface CertifiedBookmarkService : BookmarkService {
+    val accountName : String
+
+    val rks : String
+
+    /**
+     * ブックマークを投稿する
+     *
+     * 2021年時点でEvernoteは使用不可能
+     *
+     * @see CertifiedBookmarkService.postBookmark
+     */
+    @FormUrlEncoded
+    @POST("{account}/add.edit.json")
+    suspend fun __postBookmark(
+        @Field("url") url: String,
+        @Field("comment") comment: String = "",
+        @Field("post_twitter") postTwitter: Boolean = false,
+        @Field("post_facebook") postFacebook: Boolean = false,
+        @Field("post_evernote") postEvernote: Boolean = false,
+        @Field("read_later") readLater: Boolean = false,
+        @Field("private") private: Boolean = false,
+        @Path("account") accountName: String = this.accountName,
+        @Field("rks") rks: String = this.rks
+    ) : BookmarkResult
+
+    /**
+     * ブックマークを削除する
+     */
+    @POST
+    suspend fun deleteBookmark(
+        @Field("url") url: String,
+        @Path("account") accountName: String = this.accountName,
+        @Field("rks") rks: String = this.rks
+    )
+}
+
+// ------ //
+
+class CertifiedBookmarkServiceImpl(delegate : CertifiedBookmarkService) : CertifiedBookmarkService by delegate {
+    override lateinit var accountName: String
+    override lateinit var rks: String
+}
+
+// ------ //
+
+/**
+ * ブックマークを投稿する
+ *
+ * @param url ブクマするURL
+ * @param comment ブックマークコメント(UTF-8日本語100文字以内/タグ部分除く)
+ * @param postTwitter Twitterに連携投稿する
+ * @param postFacebook Facebookに連携投稿する
+ * @param readLater 「あとで読む」
+ * @param private 非公開ブクマ
+ *
+ * @return 登録完了したブクマ情報
+ */
+suspend fun CertifiedBookmarkService.postBookmark(
+    url: String,
+    comment: String = "",
+    postTwitter: Boolean = false,
+    postFacebook: Boolean = false,
+    readLater: Boolean = false,
+    private: Boolean = false
+) : BookmarkResult = __postBookmark(
+    url = url,
+    comment = comment,
+    postTwitter = postTwitter,
+    postFacebook = postFacebook,
+    readLater = readLater,
+    private = private
+)
