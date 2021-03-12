@@ -188,7 +188,8 @@ suspend fun getMyRecentStars() {
 
 ```kt
 suspend fun getRecentStarsReport() {
-    val starEntries = certifiedClient.star.getRecentStarsReport()
+    val response = certifiedClient.star.getRecentStarsReport()
+    val starEntries = response.entries
 }
 ```
 
