@@ -212,4 +212,28 @@ class EntryServiceTest : AccountServiceTestCredentials() {
             assert(it is IllegalArgumentException)
         }
     }
+
+    @Test
+    fun getEntryUrlFromUrl_https() {
+        val entryUrl = HatenaClient.entry.getEntryUrl("https://www.hoge.com/")
+        assertEquals("https://b.hatena.ne.jp/entry/s/www.hoge.com/", entryUrl)
+    }
+
+    @Test
+    fun getEntryUrlFromUrl_http() {
+        val entryUrl = HatenaClient.entry.getEntryUrl("http://www.hoge.com/")
+        assertEquals("https://b.hatena.ne.jp/entry/www.hoge.com/", entryUrl)
+    }
+
+
+    @Test
+    fun getEntryUrlFromUrl_invalid_url() {
+        runCatching {
+            val entryUrl = HatenaClient.entry.getEntryUrl("this is not an url")
+        }.onSuccess {
+            fail()
+        }.onFailure {
+            assert(it is IllegalArgumentException)
+        }
+    }
 }

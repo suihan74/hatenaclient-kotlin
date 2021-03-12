@@ -183,6 +183,24 @@ fun EntryService.getUrlFromEntryUrl(entryUrl: String) : String {
     else "https://$path"
 }
 
+/**
+ * 対象ページのURLからエントリページのURLを取得する
+ *
+ * @param url エントリの対象となっている元ページのURL
+ * @return エントリページのURL
+ * @throws IllegalArgumentException "http"or"https"スキーム以外の文字列が渡された場合
+ */
+fun EntryService.getEntryUrl(url: String) : String = buildString {
+    append("${HatenaClientBase.baseUrlB}entry/")
+    append(
+        when {
+            url.startsWith("https://") -> "s/${url.substring("https://".length)}"
+            url.startsWith("http://") -> url.substring("http://".length)
+            else -> throw IllegalArgumentException("invalid url: $url")
+        }
+    )
+}
+
 // ------ //
 
 /**
