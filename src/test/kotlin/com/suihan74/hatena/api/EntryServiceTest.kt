@@ -162,50 +162,50 @@ class EntryServiceTest : AccountServiceTestCredentials() {
      */
     @Test
     fun getUrlFromEntryUrl_case1() {
-        val url = HatenaClient.entry.getUrlFromEntryUrl("https://b.hatena.ne.jp/entry/s/www.hoge.com/")
+        val url = HatenaClient.entry.getUrl("https://b.hatena.ne.jp/entry/s/www.hoge.com/")
         assertEquals("https://www.hoge.com/", url)
     }
 
     @Test
     fun getUrlFromEntryUrl_case2() {
-        val url = HatenaClient.entry.getUrlFromEntryUrl("https://b.hatena.ne.jp/entry/https://www.hoge.com/")
+        val url = HatenaClient.entry.getUrl("https://b.hatena.ne.jp/entry/https://www.hoge.com/")
         assertEquals("https://www.hoge.com/", url)
     }
 
     @Test
     fun getUrlFromEntryUrl_case3() {
-        val url = HatenaClient.entry.getUrlFromEntryUrl("https://b.hatena.ne.jp/entry/123456789/comment/suihan74")
+        val url = HatenaClient.entry.getUrl("https://b.hatena.ne.jp/entry/123456789/comment/suihan74")
         assertEquals("https://b.hatena.ne.jp/entry/123456789", url)
     }
 
     @Test
     fun getUrlFromEntryUrl_case4() {
-        val url = HatenaClient.entry.getUrlFromEntryUrl("https://b.hatena.ne.jp/entry?url=https://www.hoge.com/")
+        val url = HatenaClient.entry.getUrl("https://b.hatena.ne.jp/entry?url=https://www.hoge.com/")
         assertEquals("https://www.hoge.com/", url)
     }
 
     @Test
     fun getUrlFromEntryUrl_case4_encoded() {
-        val url = HatenaClient.entry.getUrlFromEntryUrl("https://b.hatena.ne.jp/entry?url=https%3A%2F%2Fwww.hoge.com%2F")
+        val url = HatenaClient.entry.getUrl("https://b.hatena.ne.jp/entry?url=https%3A%2F%2Fwww.hoge.com%2F")
         assertEquals("https://www.hoge.com/", url)
     }
 
     @Test
     fun getUrlFromEntryUrl_case5() {
-        val url = HatenaClient.entry.getUrlFromEntryUrl("https://b.hatena.ne.jp/entry?eid=123456789")
+        val url = HatenaClient.entry.getUrl("https://b.hatena.ne.jp/entry?eid=123456789")
         assertEquals("https://b.hatena.ne.jp/entry/123456789", url)
     }
 
     @Test
     fun getUrlFromEntryUrl_case6() {
-        val url = HatenaClient.entry.getUrlFromEntryUrl("https://b.hatena.ne.jp/entry/123456789")
+        val url = HatenaClient.entry.getUrl("https://b.hatena.ne.jp/entry/123456789")
         assertEquals("https://b.hatena.ne.jp/entry/123456789", url)
     }
 
     @Test
     fun getUrlFromEntryUrl_case7_not_matched() {
         runCatching {
-            val url = HatenaClient.entry.getUrlFromEntryUrl("https://localhost/")
+            val url = HatenaClient.entry.getUrl("https://localhost/")
         }.onSuccess {
             fail()
         }.onFailure {

@@ -141,19 +141,21 @@ suspend fun EntryService.getUrl(eid: Long) : String {
 }
 
 /**
- * ブコメページのURLからエントリのURLを取得する
+ * エントリURLから対象ページのURLを取得する
  *
- * e.g.)
+ * @param entryUrl エントリページのURL
+ * @return エントリの対象となっている元ページのURL
+ * @throws IllegalArgumentException 渡されたurlがエントリURLとして判別不可能
+ *
+ * cases
  * 1) https://b.hatena.ne.jp/entry/s/www.hoge.com/ ==> https://www.hoge.com/
  * 2) https://b.hatena.ne.jp/entry/https://www.hoge.com/ ==> https://www.hoge.com/
  * 3) https://b.hatena.ne.jp/entry/{eid}/comment/{username} ==> https://b.hatena.ne.jp/entry/{eid}
  * 4) https://b.hatena.ne.jp/entry?url=https~~~
  * 5) https://b.hatena.ne.jp/entry?eid=1234
  * 6) https://b.hatena.ne.jp/entry/{eid}
- *
- * @throws IllegalArgumentException 渡されたurlがエントリURLとして判別不可能
  */
-fun EntryService.getUrlFromEntryUrl(entryUrl: String) : String {
+fun EntryService.getUrl(entryUrl: String) : String {
     if (entryUrl.startsWith("${HatenaClientBase.baseUrlB}entry?url=")) {
         // 4)
         return URI.create(entryUrl).queryParameters["url"] ?: throw IllegalArgumentException("invalid comment page url: $entryUrl")
