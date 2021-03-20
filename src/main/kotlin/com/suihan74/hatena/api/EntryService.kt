@@ -210,7 +210,7 @@ fun EntryService.getEntryUrl(url: String) : String = buildString {
  */
 interface CertifiedEntryService : EntryService {
     /**
-     * ユーザーがブクマしたエントリ一覧を取得する
+     * サインインユーザーがブクマしたエントリ一覧を取得する
      *
      * @param limit 最大件数
      * @param offset 取得開始位置
@@ -221,4 +221,24 @@ interface CertifiedEntryService : EntryService {
         @Query("limit") limit: Int? = null,
         @Query("of") offset: Int? = null
     ) : List<EntryItem>
+
+    /**
+     * サインインユーザーがブクマしたエントリを検索する
+     */
+    @GET("api/ipad.mysearch/{search_type}")
+    suspend fun searchBookmarkedEntries(
+        @Path("search_type") searchType: SearchType,
+        @Query("q") query: String,
+        @Query("limit") limit: Int? = null,
+        @Query("of") offset: Int? = null
+    ) : List<EntryItem>
+
+    /**
+     * マイホットエントリを取得する
+     */
+    @GET("api/entries/myhotentry.json")
+    suspend fun getMyHotEntries(
+        @Query("date") date: String? = null,
+        @Query("include_amp_urls") includeAMPUrls: Boolean = true
+    ) : List<MyHotEntry>
 }

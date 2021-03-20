@@ -23,7 +23,7 @@ data class BookmarkResult (
     val timestamp : Instant,
 
     @SerialName("timestamp")
-    private val _timestamp : String,
+    private val _timestamp : String? = null,
 
     @SerialName("user_icon_url")
     val userIconUrl : String,

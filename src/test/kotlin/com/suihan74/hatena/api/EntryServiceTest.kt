@@ -1,9 +1,6 @@
 package com.suihan74.hatena.api
 
-import com.suihan74.hatena.entry.Category
-import com.suihan74.hatena.entry.EntriesType
-import com.suihan74.hatena.entry.Issue
-import com.suihan74.hatena.entry.SearchType
+import com.suihan74.hatena.entry.*
 import com.suihan74.hatena.exception.HttpException
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
@@ -13,17 +10,22 @@ import org.junit.Assert.fail
 import org.junit.Test
 
 class EntryServiceTest : AccountServiceTestCredentials() {
+    private fun println(entry: Entry) {
+        println("  title = " + entry.title)
+        println("  url = " + entry.url)
+        println("  entryUrl = " + entry.entryUrl)
+        println("  rootUrl = " + entry.rootUrl)
+        println("  imageUrl = " + entry.imageUrl)
+        println("  faviconUrl = " + entry.faviconUrl)
+        println(Json.encodeToString(entry))
+        println("====================")
+    }
+
     private suspend fun getEntries(entriesType: EntriesType, category: Category) {
         println("type = " + entriesType.name + " | category = " + category.name)
         HatenaClient.entry.getEntries(entriesType, category).let { entries ->
             assert(entries.isNotEmpty())
-            entries.forEach {
-                println(Json.encodeToString(it))
-                println("  entryUrl = " + it.entryUrl)
-                println("  rootUrl = " + it.rootUrl)
-                println("  imageUrl = " + it.imageUrl)
-                println("  faviconUrl = " + it.faviconUrl)
-            }
+            entries.forEach { println(it) }
         }
     }
 
@@ -31,13 +33,7 @@ class EntryServiceTest : AccountServiceTestCredentials() {
         println("type = " + entriesType.name + " | issue = " + issue.name)
         HatenaClient.entry.getIssueEntries(entriesType, issue).entries.let { entries ->
             assert(entries.isNotEmpty())
-            entries.forEach {
-                println(Json.encodeToString(it))
-                println("  entryUrl = " + it.entryUrl)
-                println("  rootUrl = " + it.rootUrl)
-                println("  imageUrl = " + it.imageUrl)
-                println("  faviconUrl = " + it.faviconUrl)
-            }
+            entries.forEach { println(it) }
         }
     }
 
@@ -56,13 +52,26 @@ class EntryServiceTest : AccountServiceTestCredentials() {
     fun getBookmarkedEntries() = runBlocking {
         val client = HatenaClient.signIn(rk)
         client.entry.getBookmarkedEntries().let { entries ->
-            entries.forEach {
-                println(Json.encodeToString(it))
-                println("  entryUrl = " + it.entryUrl)
-                println("  rootUrl = " + it.rootUrl)
-                println("  imageUrl = " + it.imageUrl)
-                println("  faviconUrl = " + it.faviconUrl)
-            }
+            entries.forEach { println(it) }
+        }
+    }
+
+    @Test
+    fun searchBookmarkedEntries() = runBlocking {
+        val client = HatenaClient.signIn(rk)
+        client.entry.searchBookmarkedEntries(
+            SearchType.TAG,
+            query = "あとで読む"
+        ).let { entries ->
+            entries.forEach { println(it) }
+        }
+    }
+
+    @Test
+    fun getMyHotEntries() = runBlocking {
+        val client = HatenaClient.signIn(rk)
+        client.entry.getMyHotEntries().let { entries ->
+            entries.forEach { println(it) }
         }
     }
 
@@ -72,13 +81,7 @@ class EntryServiceTest : AccountServiceTestCredentials() {
             println("===== " + it.name + " =====")
             runCatching {
                 HatenaClient.entry.getIssues(it).issues.forEachIndexed { index, issue ->
-                    println(Json.encodeToString(issue))
-                    issue.entry!!.let { entry ->
-                        println("  entryUrl = " + entry.entryUrl)
-                        println("  rootUrl = " + entry.rootUrl)
-                        println("  imageUrl = " + entry.imageUrl)
-                        println("  faviconUrl = " + entry.faviconUrl)
-                    }
+                    println(issue.entry!!)
 
                     if (index == 0) {
                         getEntries(EntriesType.HOT, issue)

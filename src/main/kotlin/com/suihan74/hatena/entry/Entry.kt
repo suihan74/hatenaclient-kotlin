@@ -6,6 +6,7 @@ import com.suihan74.hatena.serializer.InstantISO8601Serializer
 import com.suihan74.hatena.star.StarCount
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import java.net.URI
 import java.time.Instant
 
@@ -71,7 +72,7 @@ sealed class Entry {
 // ------ //
 
 /**
- * エントリ情報
+ * エントリ情報(カテゴリ指定で得られるエントリなど)
  */
 @SerialName("entries")
 @Serializable
@@ -138,7 +139,7 @@ data class EntryItem(
 // ------ //
 
 /**
- * エントリ情報
+ * エントリ情報(特集指定で得られるエントリなど)
  */
 @SerialName("issue_entries")
 @Serializable
@@ -180,3 +181,58 @@ data class IssueEntry(
     override val bookmarkedData : BookmarkResult? = null,
 
 ) : Entry()
+
+// ------ //
+
+/**
+ * エントリ情報(マイホットエントリ用)
+ */
+@SerialName("my_hot_entries")
+@Serializable
+data class MyHotEntry(
+    override val title : String,
+
+    override val url : String,
+
+    override val description : String,
+
+    override val count : Int,
+
+    @SerialName("date")
+    @Serializable(with = InstantISO8601Serializer::class)
+    override val createdAt : Instant,
+
+    @SerialName("entry_url")
+    override val _entryUrl : String? = null,
+
+    @SerialName("root_url")
+    override val _rootUrl : String? = null,
+
+    @SerialName("favicon_url")
+    override val _faviconUrl : String? = null,
+
+    @SerialName("image")
+    override val _imageUrl : String? = null,
+
+    @SerialName("amp_url")
+    override val ampUrl : String? = null,
+
+    // ユーザーがブクマしている場合のみ取得
+    @SerialName("bookmarked_data")
+    override val bookmarkedData : BookmarkResult? = null,
+
+    @SerialName("myhotentry_comments")
+    val myHotEntryComments: List<BookmarkResult>? = null,
+
+    // eidが無い場合がある
+
+    @SerialName("eid")
+    val _eid : Long? = null,
+
+    @SerialName("entry_id")
+    private val entry_id : Long
+
+) : Entry() {
+    @Transient
+    override val eid: Long = entry_id
+}
