@@ -2,6 +2,7 @@ package com.suihan74.hatena.entry
 
 import com.suihan74.hatena.api.HatenaClient
 import com.suihan74.hatena.bookmark.BookmarkResult
+import com.suihan74.hatena.extension.toUserIconUrl
 import com.suihan74.hatena.serializer.InstantISO8601Serializer
 import com.suihan74.hatena.star.StarCount
 import kotlinx.serialization.SerialName
@@ -74,7 +75,7 @@ sealed class Entry {
 /**
  * エントリ情報(カテゴリ指定で得られるエントリなど)
  */
-@SerialName("entries")
+@SerialName("entry")
 @Serializable
 data class EntryItem(
     override val title : String,
@@ -141,7 +142,7 @@ data class EntryItem(
 /**
  * エントリ情報(特集指定で得られるエントリなど)
  */
-@SerialName("issue_entries")
+@SerialName("issue_entry")
 @Serializable
 data class IssueEntry(
     override val title : String,
@@ -187,7 +188,7 @@ data class IssueEntry(
 /**
  * エントリ情報(マイホットエントリ用)
  */
-@SerialName("my_hot_entries")
+@SerialName("my_hot_entry")
 @Serializable
 data class MyHotEntry(
     override val title : String,
@@ -235,4 +236,64 @@ data class MyHotEntry(
 ) : Entry() {
     @Transient
     override val eid: Long = entry_id
+}
+
+// ------ //
+
+@SerialName("user_entry")
+@Serializable
+data class UserEntry(
+    @SerialName("entry_id")
+    override val eid : Long,
+
+    val comment : UserEntryComment,
+
+    val entry : UserEntryBody,
+
+    @SerialName("user_name")
+    val userName : String,
+
+    // public/private
+    val status : String,
+
+    @SerialName("created_at")
+    @Serializable(with = InstantISO8601Serializer::class)
+    override val createdAt : Instant,
+) : Entry() {
+    override val url: String = entry.url
+
+    override val title: String = entry.title
+
+    override val count: Int = entry.totalBookmarks
+
+    override val description: String = entry.content
+
+    @SerialName("entry_url")
+    override val _entryUrl : String? = null
+
+    @SerialName("root_url")
+    override val _rootUrl : String? = null
+
+    @SerialName("favicon_url")
+    override val _faviconUrl : String = entry.faviconUrl ?: ""
+
+    @SerialName("image")
+    override val _imageUrl : String? = entry.imageUrl
+
+    @SerialName("amp_url")
+    override val ampUrl : String? = null
+
+    @SerialName("bookmarked_data")
+    override val bookmarkedData = BookmarkResult(
+        user = userName,
+        userIconUrl = userName.toUserIconUrl,
+        comment = comment.body,
+        commentRaw = comment.raw,
+        tags = comment.tags,
+        timestamp = createdAt,
+        permalink = "https://b.hatena.ne.jp/entry/%d/comment/%s".format(eid, userName),
+        success = true,
+        private = status == "private",
+        eid = eid
+    )
 }

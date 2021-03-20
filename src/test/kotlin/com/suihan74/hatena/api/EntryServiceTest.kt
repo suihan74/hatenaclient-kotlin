@@ -68,6 +68,15 @@ class EntryServiceTest : AccountServiceTestCredentials() {
     }
 
     @Test
+    fun getUserBookmarkedEntries() = runBlocking {
+        HatenaClient.entry.getBookmarkedEntries(
+            user = "suihan74"
+        ).forEach {
+            println(it)
+        }
+    }
+
+    @Test
     fun getMyHotEntries() = runBlocking {
         val client = HatenaClient.signIn(rk)
         client.entry.getMyHotEntries().let { entries ->

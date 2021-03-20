@@ -86,7 +86,32 @@ interface EntryService {
         @Query("of") offset: Int? = null,
         @Query("include_bookmarked_data") includeBookmarkedData: Boolean = true
     ) : List<EntryItem>
+
+    // ------ //
+
+    /**
+     * 指定ユーザーがブクマしたエントリを取得する
+     *
+     * @see EntryService.getBookmarkedEntries
+     */
+    @GET("api/internal/user/{user}/bookmarks")
+    suspend fun __getBookmarkedEntries(
+        @Path("user") user: String,
+        @Query("tag") tag: String? = null,
+        @Query("limit") limit: Int? = null,
+        @Query("of") offset: Int? = null
+    ) : UserEntryResponse
 }
+
+/**
+ * 指定ユーザーがブクマしたエントリを取得する
+ */
+suspend fun EntryService.getBookmarkedEntries(
+    user: String,
+    tag: String? = null,
+    limit: Int? = null,
+    offset: Int? = null
+) : List<UserEntry> = __getBookmarkedEntries(user, tag, limit, offset).bookmarks
 
 /**
  * 与えられたページのfaviconのURLを取得する

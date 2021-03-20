@@ -2,6 +2,7 @@ package com.suihan74.hatena.api
 
 import com.suihan74.hatena.account.*
 import com.suihan74.hatena.exception.HttpException
+import com.suihan74.hatena.extension.toUserIconUrl
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
@@ -49,8 +50,7 @@ interface AccountService {
 /**
  * ユーザーのアイコンURLを取得する
  */
-fun AccountService.getUserIconUrl(user: String) : String =
-    "https://cdn1.www.st-hatena.com/users/$user/profile.gif"
+fun AccountService.getUserIconUrl(user: String) : String = user.toUserIconUrl
 
 // ------ //
 
