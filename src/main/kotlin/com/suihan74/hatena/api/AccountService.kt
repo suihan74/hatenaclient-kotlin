@@ -84,7 +84,7 @@ interface CertifiedAccountService : AccountService {
     @FormUrlEncoded
     @POST("${HatenaClientBase.baseUrlW}notify/api/read")
     suspend fun readNotices(
-        @Field("url") rks: String = this.rks
+        @Field("rks") rks: String = this.rks
     ) : ReadNoticesResponse
 
     // ------ //
