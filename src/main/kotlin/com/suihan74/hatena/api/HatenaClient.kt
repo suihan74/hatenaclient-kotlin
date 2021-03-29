@@ -98,16 +98,16 @@ abstract class HatenaClientBaseNoCertificationRequired : HatenaClientBase() {
     // ------ //
 
     /** アカウント関係のAPI */
-    override val user : AccountService by lazy { retrofitForBookmark.create(AccountService::class.java) }
+    override val user : AccountService = retrofitForBookmark.create(AccountService::class.java)
 
     /** ブクマ関係のAPI */
-    override val bookmark : BookmarkService by lazy { retrofitForBookmark.create(BookmarkService::class.java) }
+    override val bookmark : BookmarkService = retrofitForBookmark.create(BookmarkService::class.java)
 
     /** エントリ関係のAPI */
-    override val entry : EntryService by lazy { retrofitForBookmark.create(EntryService::class.java) }
+    override val entry : EntryService = retrofitForBookmark.create(EntryService::class.java)
 
     /** スター関係のAPI */
-    override val star : StarService by lazy { retrofitForStar.create(StarService::class.java) }
+    override val star : StarService = retrofitForStar.create(StarService::class.java)
 
     // ------ //
 
@@ -187,6 +187,7 @@ class CertifiedHatenaClient internal constructor() : HatenaClientBase() {
             it.accountName = accountName
             it.rks = rks
         }
+        (entry as CertifiedEntryServiceImpl).accountName = accountName
         (bookmark as CertifiedBookmarkServiceImpl).let {
             it.accountName = accountName
             it.rks = rks
@@ -199,22 +200,20 @@ class CertifiedHatenaClient internal constructor() : HatenaClientBase() {
     // ------ //
 
     /** アカウント関係のAPI */
-    override val user : CertifiedAccountService by lazy {
+    override val user : CertifiedAccountService =
         CertifiedAccountServiceImpl(retrofitForBookmark.create(CertifiedAccountService::class.java))
-    }
 
     /** ブクマ関係のAPI */
-    override val bookmark : CertifiedBookmarkService by lazy {
+    override val bookmark : CertifiedBookmarkService =
         CertifiedBookmarkServiceImpl(retrofitForBookmark.create(CertifiedBookmarkService::class.java))
-    }
 
     /** エントリ関係のAPI */
-    override val entry : CertifiedEntryService by lazy { retrofitForBookmark.create(CertifiedEntryService::class.java) }
+    override val entry : CertifiedEntryService =
+        CertifiedEntryServiceImpl(retrofitForBookmark.create(CertifiedEntryService::class.java))
 
     /** スター関係のAPI */
-    override val star : CertifiedStarService by lazy {
+    override val star : CertifiedStarService =
         CertifiedStarServiceImpl(retrofitForStar.create(CertifiedStarService::class.java))
-    }
 
     // ------ //
 

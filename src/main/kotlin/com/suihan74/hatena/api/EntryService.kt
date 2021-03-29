@@ -234,6 +234,8 @@ fun EntryService.getEntryUrl(url: String) : String = buildString {
  * 認証が必要なエントリ関係API
  */
 interface CertifiedEntryService : EntryService {
+    val accountName : String
+
     /**
      * サインインユーザーがブクマしたエントリ一覧を取得する
      *
@@ -266,4 +268,25 @@ interface CertifiedEntryService : EntryService {
         @Query("date") date: String? = null,
         @Query("include_amp_urls") includeAMPUrls: Boolean = true
     ) : List<MyHotEntry>
+
+    @GET("api/my/15th/yearly_random_bookmarks")
+    suspend fun __getUserHistoricalEntries(
+        @Query("year") year: Int,
+        @Query("limit") limit: Int = 10
+    ) : List<UserHistoricalEntry>
+}
+
+class CertifiedEntryServiceImpl(delegate : CertifiedEntryService) : CertifiedEntryService by delegate {
+    override lateinit var accountName: String
+}
+
+/**
+ * ユーザーの15周年タイムカプセルエントリを取得する
+ *
+ * @param year 2011 ~ 2020
+ */
+suspend fun CertifiedEntryService.getUserHistoricalEntries(year: Int, limit: Int = 10) : List<Entry> {
+    return __getUserHistoricalEntries(year, limit).map {
+        it.toEntry(accountName)
+    }
 }

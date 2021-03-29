@@ -162,7 +162,6 @@ class EntryServiceTest : AccountServiceTestCredentials() {
         }
     }
 
-
     /*
     * 1) https://b.hatena.ne.jp/entry/s/www.hoge.com/ ==> https://www.hoge.com/
     * 2) https://b.hatena.ne.jp/entry/https://www.hoge.com/ ==> https://www.hoge.com/
@@ -237,7 +236,6 @@ class EntryServiceTest : AccountServiceTestCredentials() {
         assertEquals("https://b.hatena.ne.jp/entry/www.hoge.com/", entryUrl)
     }
 
-
     @Test
     fun getEntryUrlFromUrl_invalid_url() {
         runCatching {
@@ -247,5 +245,12 @@ class EntryServiceTest : AccountServiceTestCredentials() {
         }.onFailure {
             assert(it is IllegalArgumentException)
         }
+    }
+
+    @Test
+    fun getUserHistoricalEntries() = runBlocking {
+        val client = HatenaClient.signIn(rk)
+        val entries = client.entry.getUserHistoricalEntries(year = 2020)
+        entries.forEach { println(it) }
     }
 }

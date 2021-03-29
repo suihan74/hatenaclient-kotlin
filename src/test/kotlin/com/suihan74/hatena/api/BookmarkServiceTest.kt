@@ -1,16 +1,20 @@
 package com.suihan74.hatena.api
 
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import retrofit2.Retrofit
 import java.net.URLEncoder
 
 internal class BookmarkServiceTest {
@@ -41,9 +45,19 @@ internal class BookmarkServiceTest {
             """.trimIndent()))
         }
 
+        val retrofit = Retrofit.Builder()
+            .baseUrl(server.url("").toString())
+            .addConverterFactory(ObjectParameterConverterFactory)
+            .addConverterFactory(
+                Json.asConverterFactory("application/json".toMediaType())
+            )
+            .client(OkHttpClient.Builder().build())
+            .build()
+        val service = retrofit.create(BookmarkService::class.java)
+
         // 403
         runCatching {
-            hatenaApi.bookmark.getRecentBookmarks(url = testUrl)
+            service.getRecentBookmarks(url = testUrl)
         }.onFailure {
             it.printStackTrace()
         }.onSuccess {
@@ -53,7 +67,7 @@ internal class BookmarkServiceTest {
 
         // 404
         runCatching {
-            hatenaApi.bookmark.getRecentBookmarks(url = testUrl)
+            service.getRecentBookmarks(url = testUrl)
         }.onFailure {
             it.printStackTrace()
         }.onSuccess {
@@ -61,7 +75,7 @@ internal class BookmarkServiceTest {
         }
 
         // 200
-        hatenaApi.bookmark.getRecentBookmarks(url = testUrl).also {
+        service.getRecentBookmarks(url = testUrl).also {
             val request = server.takeRequest()
             println(request.path)
             assertEquals(null, request.failure)
@@ -90,9 +104,19 @@ internal class BookmarkServiceTest {
             """.trimIndent()))
         }
 
+        val retrofit = Retrofit.Builder()
+            .baseUrl(server.url("").toString())
+            .addConverterFactory(ObjectParameterConverterFactory)
+            .addConverterFactory(
+                Json.asConverterFactory("application/json".toMediaType())
+            )
+            .client(OkHttpClient.Builder().build())
+            .build()
+        val service = retrofit.create(BookmarkService::class.java)
+
         // 403
         runCatching {
-            hatenaApi.bookmark.getBookmarksDigest(url = testUrl)
+            service.getBookmarksDigest(url = testUrl)
         }.onFailure {
             it.printStackTrace()
         }.onSuccess {
@@ -101,7 +125,7 @@ internal class BookmarkServiceTest {
 
         // 404
         runCatching {
-            hatenaApi.bookmark.getBookmarksDigest(url = testUrl)
+            service.getBookmarksDigest(url = testUrl)
         }.onFailure {
             it.printStackTrace()
         }.onSuccess {
@@ -109,7 +133,7 @@ internal class BookmarkServiceTest {
         }
 
         // 200
-        hatenaApi.bookmark.getBookmarksDigest(url = testUrl).also { body ->
+        service.getBookmarksDigest(url = testUrl).also { body ->
             val request = server.takeRequest()
             println(request.path)
             assertEquals(null, request.failure)
