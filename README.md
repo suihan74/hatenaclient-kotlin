@@ -29,7 +29,7 @@ dependencies {
     // ...
 
     // HatenaClient
-    implementation 'com.github.suihan74:hatenaclient-kotlin:0.0.5'
+    implementation 'com.github.suihan74:hatenaclient-kotlin:0.0.6'
     
     // Coroutines
     def coroutines_version = '1.4.2'
@@ -71,7 +71,10 @@ suspend fun account() {
 
 ```kt
 suspend fun getNotices() {
+    // 通知を取得
     val response = certifiedClient.user.getNotices()
+    // 通知の最終確認時刻を更新
+    certifiedClient.user.readNotices()
 }
 ```
 
@@ -132,6 +135,32 @@ suspend fun issues() {
 
     // 特集を指定してエントリ一覧を取得
     val entriesOfFirstItIssue = HatenaClient.entry.getEntries(EntriesType.HOT, issues[0])
+}
+```
+
+#### My hot entries
+
+```kt
+suspend fun myHotEntries() {
+    val entries = certifiedClient.entry.getMyHotEntries()
+}
+```
+
+#### Entries bookmarked by the specified user
+
+```kt
+suspend fun userBookmarkedEntries() {
+    // 指定ユーザーがブクマしたエントリ
+    val suihanEntries = HatenaClient.entry.getBookmarkedEntries(user = "suihan74")
+    
+    // サインインしているユーザーがブクマしたエントリ
+    val userEntries = certifiedClient.entry.getBookmarkedEntries()
+    
+    // サインインしているユーザーがブクマしたエントリを検索
+    val searchResult = certifiedClient.entry.searchBookmarkedEntries(
+        SearchType.TAG,
+        query = "あとで読む"
+    )
 }
 ```
 
