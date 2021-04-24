@@ -229,4 +229,20 @@ internal class AccountServiceTest : AccountServiceTestCredentials() {
         val url = HatenaClient.user.getUserIconUrl("suihan74")
         assertEquals("https://cdn1.www.st-hatena.com/users/suihan74/profile.gif", url)
     }
+
+    @Test
+    fun getUserTags() = runBlocking {
+        val list = HatenaClient.user.getUserTags("suihan74")
+        list.forEach { tag ->
+            println("${tag.text}(${tag.count}) : ${tag.timestamp}")
+        }
+    }
+
+    @Test
+    fun getSignedUserTags() = runBlocking {
+        val list = client.user.getUserTags()
+        list.forEach { tag ->
+            println("${tag.text}(${tag.count}) : ${tag.timestamp}")
+        }
+    }
 }

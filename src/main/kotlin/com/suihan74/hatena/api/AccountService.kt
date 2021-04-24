@@ -1,6 +1,7 @@
 package com.suihan74.hatena.api
 
 import com.suihan74.hatena.account.*
+import com.suihan74.hatena.account.Tag
 import com.suihan74.hatena.exception.HttpException
 import com.suihan74.hatena.extension.toUserIconUrl
 import okhttp3.ResponseBody
@@ -45,12 +46,30 @@ interface AccountService {
     suspend fun getFollowers(
         @Path("user") user: String
     ) : FollowersResponse
+
+    // ------ //
+
+    /**
+     * 指定ユーザーが使用したタグを取得する
+     */
+    @GET("{user}/tags.json")
+    suspend fun __getUserTags(@Path("user") user: String) : TagsResponse
 }
 
 /**
  * ユーザーのアイコンURLを取得する
  */
 fun AccountService.getUserIconUrl(user: String) : String = user.toUserIconUrl
+
+/**
+ * 指定ユーザーが使用したタグを取得する
+ */
+suspend fun AccountService.getUserTags(user: String) : List<Tag> {
+    val response = __getUserTags(user)
+    return response.tags
+        .map { Tag(text = it.key, index = it.value.index, count = it.value.count, timestamp = it.value.timestamp) }
+        .sortedBy { it.index }
+}
 
 // ------ //
 
@@ -172,4 +191,11 @@ suspend fun CertifiedAccountService.getIgnoredUsersAll() : IgnoredUsersResponse 
         } while (result.isSuccess && cursor != null)
     }
     return IgnoredUsersResponse(users = users, cursor = cursor)
+}
+
+/**
+ * ログインユーザーが使用しているタグを取得する
+ */
+suspend fun CertifiedAccountService.getUserTags() : List<Tag> {
+    return getUserTags(user = accountName)
 }
