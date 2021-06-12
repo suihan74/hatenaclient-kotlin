@@ -175,35 +175,38 @@ suspend fun EntryService.getUrl(eid: Long) : String {
  * cases
  * 1) https://b.hatena.ne.jp/entry/s/www.hoge.com/ ==> https://www.hoge.com/
  * 2) https://b.hatena.ne.jp/entry/https://www.hoge.com/ ==> https://www.hoge.com/
- * 3) https://b.hatena.ne.jp/entry/{eid}/comment/{username} ==> https://b.hatena.ne.jp/entry/{eid}
+ * 3) https://b.hatena.ne.jp/entry/{eid}/comment/{username} ==> https://b.hatena.ne.jp/entry/{eid}  (modifySpecificUrls()を参照)
  * 4) https://b.hatena.ne.jp/entry?url=https~~~
  * 5) https://b.hatena.ne.jp/entry?eid=1234
  * 6) https://b.hatena.ne.jp/entry/{eid}
+ * 7) https://b.hatena.ne.jp/entry.touch/s/~~~
+ * 8) https://b.hatena.ne.jp/entry/panel/?url=~~~
  */
 fun EntryService.getUrl(entryUrl: String) : String {
-    if (entryUrl.startsWith("${HatenaClientBase.baseUrlB}entry?url=")) {
-        // 4)
+    val baseUrl = HatenaClientBase.baseUrlB
+    if (entryUrl.startsWith("${baseUrl}entry?url=") || entryUrl.startsWith("${HatenaClientBase.baseUrlB}/entry/panel/?url=")) {
+        // 4, 8)
         return URI.create(entryUrl).queryParameters["url"] ?: throw IllegalArgumentException("invalid comment page url: $entryUrl")
     }
-    else if (entryUrl.startsWith("${HatenaClientBase.baseUrlB}entry?eid=")) {
+    else if (entryUrl.startsWith("${baseUrl}entry?eid=")) {
         // 5)
         val eid = URI.create(entryUrl).queryParameters["eid"] ?: throw IllegalArgumentException("invalid comment page url: $entryUrl")
-        return "${HatenaClientBase.baseUrlB}entry/$eid"
+        return "${baseUrl}entry/$eid"
     }
 
     val commentUrlRegex = Regex("""https?://b\.hatena\.ne\.jp/entry/(\d+)(/comment/\w+)?""")
     val commentUrlMatch = commentUrlRegex.matchEntire(entryUrl)
     if (commentUrlMatch != null) {
         // 3, 6)
-        return "${HatenaClientBase.baseUrlB}entry/${commentUrlMatch.groups[1]!!.value}"
+        return "${baseUrl}entry/${commentUrlMatch.groups[1]!!.value}"
     }
 
-    val regex = Regex("""https?://b\.hatena\.ne\.jp/entry/(https://|s/)?(.+)""")
+    val regex = Regex("""https?://b\.hatena\.ne\.jp/entry(\.touch)?/(https://|s/)?(.+)""")
     val matches = regex.matchEntire(entryUrl) ?: throw IllegalArgumentException("invalid comment page url: $entryUrl")
-    val path = matches.groups[2]?.value ?: throw IllegalArgumentException("invalid comment page url: $entryUrl")
+    val path = matches.groups[3]?.value ?: throw IllegalArgumentException("invalid comment page url: $entryUrl")
 
     // 1,2)
-    return if (matches.groups[1]?.value.isNullOrEmpty()) {
+    return if (matches.groups[2]?.value.isNullOrEmpty()) {
         if (path.startsWith("http://")) path // 2)
         else "http://$path" // 1)
     }
