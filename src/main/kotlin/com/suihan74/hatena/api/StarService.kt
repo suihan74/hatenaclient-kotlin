@@ -1,12 +1,15 @@
 package com.suihan74.hatena.api
 
 import com.suihan74.hatena.exception.HttpException
+import com.suihan74.hatena.star.StarColor
+import com.suihan74.hatena.star.StarPalette
 import com.suihan74.hatena.star.StarsEntriesResponse
 import com.suihan74.hatena.star.StarsEntry
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -82,6 +85,27 @@ interface CertifiedStarService : StarService {
     suspend fun getRecentStarsReport(
         @Path("userId") userId: String = this.accountName
     ) : StarsEntriesResponse
+
+    // ------ //
+
+    /**
+     * 対象URL上での現在のカラーパレット状態を取得する
+     */
+    @GET("colorpalette.json")
+    suspend fun getColorPalette(
+        @Query("uri") url: String,
+        @Query("date") date: Int
+    ) : StarPalette
+
+    /**
+     * 対象URLでのカラーパレット状態を変更する
+     */
+    @POST("colorpalette.json")
+    suspend fun changeColorPalette(
+        @Query("uri") url: String,
+        @Query("color") color: StarColor,
+        @Query("token") palette: StarPalette
+    )
 }
 
 // ------ //

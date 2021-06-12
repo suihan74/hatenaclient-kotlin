@@ -2,9 +2,12 @@ package com.suihan74.hatena.api
 
 import com.suihan74.hatena.entry.*
 import com.suihan74.hatena.extension.int
+import com.suihan74.hatena.star.StarColor
+import com.suihan74.hatena.star.StarPalette
 import retrofit2.Converter
 import retrofit2.Retrofit
 import java.lang.reflect.Type
+import java.util.*
 
 /**
  * パラメータにオブジェクトを使用するためのコンバータ
@@ -21,6 +24,8 @@ internal object ObjectParameterConverterFactory : Converter.Factory() {
             EntriesType::class.java -> selectEntriesTypeConverter(annotations)
             Issue::class.java -> IssueConverter
             Boolean::class.java -> BooleanConverter
+            StarColor::class.java -> StarColorConverter
+            StarPalette::class.java -> StarPaletteConverter
             else -> null
         }
 
@@ -61,5 +66,13 @@ internal object ObjectParameterConverterFactory : Converter.Factory() {
 
     object BooleanConverter : Converter<Boolean, String> {
         override fun convert(value: Boolean) = value.int.toString()
+    }
+
+    object StarColorConverter : Converter<StarColor, String> {
+        override fun convert(value: StarColor) = value.name.toLowerCase(Locale.ROOT)
+    }
+
+    object StarPaletteConverter : Converter<StarPalette, String> {
+        override fun convert(value: StarPalette) = value.token
     }
 }
