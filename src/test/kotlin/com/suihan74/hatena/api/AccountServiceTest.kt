@@ -38,13 +38,16 @@ internal class AccountServiceTest : AccountServiceTestCredentials() {
     @Test
     fun signIn() = runBlocking {
         // Basic認証
+        /*
+        // 2021.06 公式が reCAPTCHA 導入してできなくなった
         val client = HatenaClient.signIn(user, password)
         val rk = client.rk
         assert(rk != null)
+        */
 
         // アカウント情報取得
         val account = client.user.getAccount()
-        Assert.assertEquals(user, account.name)
+        assertEquals(user, account.name)
         println(Json.encodeToString(account))
 
         val rkStr = client.rkStr
@@ -54,7 +57,7 @@ internal class AccountServiceTest : AccountServiceTestCredentials() {
         // 再サインイン
         val client2 = HatenaClient.signIn(rkStr!!)
         val account2 = client2.user.getAccount()
-        Assert.assertEquals(user, account2.name)
+        assertEquals(user, account2.name)
     }
 
     @Test

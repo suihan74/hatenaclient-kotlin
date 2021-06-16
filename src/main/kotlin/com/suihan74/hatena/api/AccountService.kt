@@ -20,11 +20,12 @@ interface AccountService {
      * @return 成功時: アカウント情報
      * @throws HttpException 通信失敗
      */
+    @Deprecated("")
     @FormUrlEncoded
     @POST("${HatenaClientBase.baseUrlW}login")
     suspend fun __signInImpl(
         @Field("name") name: String,
-        @Field("password") password: String
+        @Field("password") password: String,
     ) : Response<ResponseBody>
 
     /**

@@ -49,4 +49,7 @@ data class Account(
 
     @SerialName("twitter_checked")
     val twitterChecked : String,
+
+    @SerialName("ga_user_id")
+    val gaUserId : String,
 )

@@ -4,6 +4,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import com.suihan74.hatena.account.Account
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import okhttp3.Interceptor
 import okhttp3.JavaNetCookieJar
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -90,10 +91,15 @@ sealed class HatenaClientBase {
  * サインイン無しで使用できるAPI群(mockテスト用途)
  */
 abstract class HatenaClientBaseNoCertificationRequired : HatenaClientBase() {
-    override val okHttpClient by lazy {
-        OkHttpClient.Builder()
-            .build()
-    }
+    override val okHttpClient = OkHttpClient.Builder()
+/*        .apply { interceptors().add(Interceptor { chain ->
+            val request = chain.request()
+                .newBuilder()
+                .header("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/525.13 (KHTML, like Gecko) Chrome/0.2.149.27 Safari/525.13")
+                .build()
+            return@Interceptor chain.proceed(request)
+        }) }*/
+        .build()
 
     // ------ //
 
@@ -112,6 +118,7 @@ abstract class HatenaClientBaseNoCertificationRequired : HatenaClientBase() {
     // ------ //
 
     /** サインインが必要なAPIが使用できるインスタンスを作成する */
+    @Deprecated("")
     abstract suspend fun signIn(name: String, password: String) : CertifiedHatenaClient
 
     /** Cookieを利用して再ログイン */
@@ -221,6 +228,7 @@ class CertifiedHatenaClient internal constructor() : HatenaClientBase() {
         /**
          * ユーザーIDとパスワードでサインインして認証済みクライアントを作成する
          */
+        @Deprecated("")
         suspend fun createInstance(name: String, password: String) = CertifiedHatenaClient().also {
             it.user.__signInImpl(name, password)
             it.user.getAccount().let { account ->
