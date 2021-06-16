@@ -47,15 +47,14 @@ dependencies {
 
 ```kt
 suspend fun signIn() {
-    // ユーザー名とパスワードでサインイン
-    val certifiedClient = HatenaClient.signIn("userId or mail address", "password")
+    val rk = "..."
 
-    val rkStr = certifiedClient.rkStr
-
-    // 認証情報を使用して再サインイン
-    val certifiedClient2 = HatenaClient.signIn(rkStr)
+    // 認証情報付きのクライアントを取得する
+    val certifiedClient = HatenaClient.signIn(rk)
 }
 ```
+
+`rk`はアプリ内ブラウザなど別の手段でHatenaにサインインし，クッキーを取得する必要があります。
 
 #### Account
 
