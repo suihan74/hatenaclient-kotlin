@@ -163,13 +163,16 @@ class EntryServiceTest : AccountServiceTestCredentials() {
     }
 
     /*
-    * 1) https://b.hatena.ne.jp/entry/s/www.hoge.com/ ==> https://www.hoge.com/
-    * 2) https://b.hatena.ne.jp/entry/https://www.hoge.com/ ==> https://www.hoge.com/
-    * 3) https://b.hatena.ne.jp/entry/{eid}/comment/{username} ==> https://b.hatena.ne.jp/entry/{eid}
-    * 4) https://b.hatena.ne.jp/entry?url=https~~~
-    * 5) https://b.hatena.ne.jp/entry?eid=1234
-    * 6) https://b.hatena.ne.jp/entry/{eid}
-    * 7) @throws IllegalArgumentException 渡されたurlがエントリURLとして判別不可能
+     * 1) https://b.hatena.ne.jp/entry/s/www.hoge.com/ ==> https://www.hoge.com/
+     * 2) https://b.hatena.ne.jp/entry/https://www.hoge.com/ ==> https://www.hoge.com/
+     * 3) https://b.hatena.ne.jp/entry/{eid}/comment/{username} ==> https://b.hatena.ne.jp/entry/{eid}  (modifySpecificUrls()を参照)
+     * 4) https://b.hatena.ne.jp/entry?url=https~~~
+     * 5) https://b.hatena.ne.jp/entry?eid=1234
+     * 6) https://b.hatena.ne.jp/entry/{eid}
+     * 7) https://b.hatena.ne.jp/entry.touch/s/~~~
+     * 8) https://b.hatena.ne.jp/entry/panel/?url=~~~
+     *
+     * 9) @throws IllegalArgumentException 渡されたurlがエントリURLとして判別不可能
      */
     @Test
     fun getUrlFromEntryUrl_case1() {
@@ -214,7 +217,19 @@ class EntryServiceTest : AccountServiceTestCredentials() {
     }
 
     @Test
-    fun getUrlFromEntryUrl_case7_not_matched() {
+    fun getUrlFromEntryUrl_case7() {
+        val url = HatenaClient.entry.getUrl("https://b.hatena.ne.jp/entry.touch/s/www.hoge.com/")
+        assertEquals("https://www.hoge.com/", url)
+    }
+
+    @Test
+    fun getUrlFromEntryUrl_case8() {
+        val url = HatenaClient.entry.getUrl("https://b.hatena.ne.jp/entry/panel/?url=https%3A%2F%2Fwww.hoge.com%2F")
+        assertEquals("https://www.hoge.com/", url)
+    }
+
+    @Test
+    fun getUrlFromEntryUrl_case9_not_matched() {
         runCatching {
             val url = HatenaClient.entry.getUrl("https://localhost/")
         }.onSuccess {

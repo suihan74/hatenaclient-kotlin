@@ -184,7 +184,7 @@ suspend fun EntryService.getUrl(eid: Long) : String {
  */
 fun EntryService.getUrl(entryUrl: String) : String {
     val baseUrl = HatenaClientBase.baseUrlB
-    if (entryUrl.startsWith("${baseUrl}entry?url=") || entryUrl.startsWith("${HatenaClientBase.baseUrlB}/entry/panel/?url=")) {
+    if (entryUrl.startsWith("${baseUrl}entry?url=") || entryUrl.startsWith("${baseUrl}entry/panel/?url=")) {
         // 4, 8)
         return URI.create(entryUrl).queryParameters["url"] ?: throw IllegalArgumentException("invalid comment page url: $entryUrl")
     }
