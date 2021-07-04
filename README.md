@@ -4,7 +4,7 @@
 
 under development...
 
-This is a module for accessing Hatena Bookmark by using Kotlin.
+The modules for accessing Hatena Bookmark by using Kotlin.
 
 ## How to use
 
@@ -29,10 +29,10 @@ dependencies {
     // ...
 
     // HatenaClient
-    implementation 'com.github.suihan74:hatenaclient-kotlin:0.0.7'
-    
+    implementation 'com.github.suihan74:hatenaclient-kotlin:0.0.8'
+
     // Coroutines
-    def coroutines_version = '1.4.2'
+    def coroutines_version = '1.5.0'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
 }
 ```
