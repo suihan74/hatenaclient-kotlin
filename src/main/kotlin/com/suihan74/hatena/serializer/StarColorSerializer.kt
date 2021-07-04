@@ -14,7 +14,7 @@ internal class StarColorSerializer : KSerializer<StarColor> {
         get() = PrimitiveSerialDescriptor(this::class.qualifiedName!!, PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: StarColor) {
-        encoder.encodeString(value.name.toLowerCase(Locale.ENGLISH))
+        encoder.encodeString(value.name.lowercase())
     }
 
     override fun deserialize(decoder: Decoder): StarColor {

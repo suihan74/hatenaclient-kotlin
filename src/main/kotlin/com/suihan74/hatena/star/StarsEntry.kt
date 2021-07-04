@@ -36,7 +36,7 @@ data class StarsEntry(
         stars.groupBy { "${it.user},${it.color.name}" }
             .map {
                 it.value[0].copy(
-                    count = it.value.sumBy { s -> s.count }
+                    count = it.value.sumOf { s -> s.count }
                 )
             }
     }
@@ -45,14 +45,14 @@ data class StarsEntry(
      * 全スター数
      */
     val totalCount : Int by lazy {
-        stars.sumBy { it.count } + (coloredStars.sumBy { it.stars.count() })
+        stars.sumOf { it.count } + (coloredStars.sumOf { it.stars.count() })
     }
 
     /**
      * 指定色のスター数
      */
     fun starsCount(color: StarColor) : Int = when (color) {
-        StarColor.YELLOW -> stars.sumBy { it.count }
+        StarColor.YELLOW -> stars.sumOf { it.count }
         else -> coloredStars.firstOrNull { it.color == color }?.starsCount ?: 0
     }
 }

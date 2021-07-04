@@ -7,7 +7,6 @@ import com.suihan74.hatena.star.StarPalette
 import retrofit2.Converter
 import retrofit2.Retrofit
 import java.lang.reflect.Type
-import java.util.*
 
 /**
  * パラメータにオブジェクトを使用するためのコンバータ
@@ -69,7 +68,7 @@ internal object ObjectParameterConverterFactory : Converter.Factory() {
     }
 
     object StarColorConverter : Converter<StarColor, String> {
-        override fun convert(value: StarColor) = value.name.toLowerCase(Locale.ROOT)
+        override fun convert(value: StarColor) = value.name.lowercase()
     }
 
     object StarPaletteConverter : Converter<StarPalette, String> {

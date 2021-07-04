@@ -24,6 +24,6 @@ data class ColorStars(
 
     /** 総スター数 */
     val starsCount : Int by lazy {
-        stars.sumBy { it.count }
+        stars.sumOf { it.count }
     }
 }

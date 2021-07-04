@@ -18,7 +18,7 @@ enum class StarColor {
 
     companion object {
         fun fromName(name: String) : StarColor {
-            val nameLower = name.toUpperCase(Locale.ENGLISH)
+            val nameLower = name.lowercase()
             return values().firstOrNull { it.name == nameLower } ?: YELLOW
         }
     }
