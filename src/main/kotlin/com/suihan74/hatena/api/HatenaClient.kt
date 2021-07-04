@@ -187,7 +187,7 @@ class CertifiedHatenaClient internal constructor() : HatenaClientBase() {
     private lateinit var rks : String
 
     /** アカウント情報を初期化 */
-    internal fun initializeAccount(account: Account) {
+    internal fun initializeAccount(account: Account, starRks: String) {
         accountName = account.name
         rks = account.rks
         (user as CertifiedAccountServiceImpl).let {
@@ -201,6 +201,8 @@ class CertifiedHatenaClient internal constructor() : HatenaClientBase() {
         }
         (star as CertifiedStarServiceImpl).let {
             it.accountName = accountName
+            it.rks = starRks
+            it.rk = rkStr!!
         }
     }
 
@@ -232,7 +234,7 @@ class CertifiedHatenaClient internal constructor() : HatenaClientBase() {
         suspend fun createInstance(name: String, password: String) = CertifiedHatenaClient().also {
             it.user.__signInImpl(name, password)
             it.user.getAccount().let { account ->
-                it.initializeAccount(account)
+                it.initializeAccount(account, "")
             }
         }
         /**
@@ -247,9 +249,9 @@ class CertifiedHatenaClient internal constructor() : HatenaClientBase() {
                     cookie.maxAge = -1
                 }
             )
-            it.user.getAccount().let { account ->
-                it.initializeAccount(account)
-            }
+            val account = it.user.getAccount()
+            val starCredential = it.star.__getCredential()
+            it.initializeAccount(account, starCredential.rks!!)
         }
     }
 }

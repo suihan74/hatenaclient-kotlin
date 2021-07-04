@@ -24,6 +24,9 @@ data class UserColorStarCounts(
 @Serializable
 data class UserColorStarCountsResponse(
     val success : Boolean,
-    val Message : String,
-    val result : Map<String, UserColorStarCounts>
-)
+    val result : Map<String, UserColorStarCounts>,
+    val message : String? = ""
+) {
+    val stars : UserColorStarCounts?
+        get() = result["counts"]
+}

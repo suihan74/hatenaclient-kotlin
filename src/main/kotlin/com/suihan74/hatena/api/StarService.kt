@@ -1,17 +1,14 @@
 package com.suihan74.hatena.api
 
 import com.suihan74.hatena.exception.HttpException
-import com.suihan74.hatena.star.StarColor
-import com.suihan74.hatena.star.StarPalette
-import com.suihan74.hatena.star.StarsEntriesResponse
-import com.suihan74.hatena.star.StarsEntry
+import com.suihan74.hatena.star.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Path
-import retrofit2.http.Query
+import retrofit2.Response
+import retrofit2.http.*
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 /**
  * スター関連のAPI
@@ -59,6 +56,8 @@ suspend fun StarService.getStarsEntries(urls: List<String>) : List<StarsEntry> {
  */
 interface CertifiedStarService : StarService {
     val accountName : String
+    val rks : String
+    val rk : String
 
     /**
      * スターAPI用のrks取得
@@ -89,12 +88,22 @@ interface CertifiedStarService : StarService {
     // ------ //
 
     /**
+     * 所有しているカラースター数を取得する
+     */
+    @GET("api/v0/me/colorstars")
+    suspend fun getMyColorStars(
+        @Header("Content-Type") contentType: String = "application/json",
+        @Header("X-Internal-API-Key") apiKey: String = "wvlYJXSGDMY161Bbw4TEf8unWl4pDLLB1gy7PGcA",
+        @Header("X-Internal-API-RK") rk: String = this.rk
+    ) : UserColorStarCountsResponse
+
+    /**
      * 対象URL上での現在のカラーパレット状態を取得する
      */
     @GET("colorpalette.json")
     suspend fun getColorPalette(
         @Query("uri") url: String,
-        @Query("date") date: Int
+        @Query("date") date: Long
     ) : StarPalette
 
     /**
@@ -105,7 +114,52 @@ interface CertifiedStarService : StarService {
         @Query("uri") url: String,
         @Query("color") color: StarColor,
         @Query("token") palette: StarPalette
+    ) : Response<*>
+
+    /**
+     * スターを投稿する
+     */
+    @GET("star.add.json")
+    suspend fun __postStar(
+        @Query("uri") url: String,
+        @Query("quote") quote: String? = null,
+        @Query("rks") rks: String = this.rks
     )
+
+    /**
+     * スターを削除する
+     */
+    @GET("star.delete.json")
+    suspend fun deleteStar(
+        @Query("uri") url: String,
+        @Query("name") userName: String,
+        @Query("color") color: StarColor,
+        @Query("quote") quote: String,
+        @Query("rks") rks: String = this.rks
+    )
+}
+
+/**
+ * スターを投稿する
+ */
+suspend fun CertifiedStarService.postStar(
+    url: String,
+    color: StarColor,
+    quote: String? = null
+) {
+    val palette = getColorPalette(url, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
+    if (color == palette.color) {
+        return
+    }
+    else if (!palette.colorStarCounts.has(color)) {
+        return // throw exception
+    }
+
+    val response = changeColorPalette(url, color, palette)
+
+    if (response.isSuccessful) {
+        __postStar(url, quote)
+    }
 }
 
 // ------ //
@@ -114,4 +168,6 @@ class CertifiedStarServiceImpl(
     delegate : CertifiedStarService
 ) : CertifiedStarService by delegate {
     override lateinit var accountName : String
+    override lateinit var rks : String
+    override lateinit var rk : String
 }

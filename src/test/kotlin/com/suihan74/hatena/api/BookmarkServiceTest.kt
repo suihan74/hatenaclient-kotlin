@@ -49,6 +49,7 @@ internal class BookmarkServiceTest {
             .baseUrl(server.url("").toString())
             .addConverterFactory(ObjectParameterConverterFactory)
             .addConverterFactory(
+                @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
                 Json.asConverterFactory("application/json".toMediaType())
             )
             .client(OkHttpClient.Builder().build())
@@ -108,6 +109,7 @@ internal class BookmarkServiceTest {
             .baseUrl(server.url("").toString())
             .addConverterFactory(ObjectParameterConverterFactory)
             .addConverterFactory(
+                @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
                 Json.asConverterFactory("application/json".toMediaType())
             )
             .client(OkHttpClient.Builder().build())

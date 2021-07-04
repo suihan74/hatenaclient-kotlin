@@ -7,10 +7,22 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
+import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Test
 import retrofit2.Retrofit
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 class StarServiceTest : AccountServiceTestCredentials() {
+    private lateinit var client : CertifiedHatenaClient
+
+    init {
+        runBlocking {
+            client = HatenaClient.signIn(rk)
+        }
+    }
+
     @OptIn(ExperimentalSerializationApi::class)
     private val service = Retrofit.Builder()
         .baseUrl(HatenaClient.baseUrlS)
@@ -49,14 +61,12 @@ class StarServiceTest : AccountServiceTestCredentials() {
 
     @Test
     fun signInStar() = runBlocking {
-        val client = HatenaClient.signIn(rk)
         val response = client.star.__getCredential()
         println(Json.encodeToString(response))
     }
 
     @Test
     fun getMyRecentStars() = runBlocking {
-        val client = HatenaClient.signIn(rk)
         val entries = client.star.getMyRecentStars()
         entries.forEach {
             println(Json.encodeToString(it))
@@ -65,10 +75,25 @@ class StarServiceTest : AccountServiceTestCredentials() {
 
     @Test
     fun getRecentStarsReport() = runBlocking {
-        val client = HatenaClient.signIn(rk)
         val response = client.star.getRecentStarsReport()
         response.entries.forEach {
             println(Json.encodeToString(it))
         }
+    }
+
+    @Test
+    fun getMyColorStars() = runBlocking {
+        val response = client.star.getMyColorStars()
+        val colorStars = response.stars
+        println(Json.encodeToString(colorStars))
+    }
+
+    @Test
+    fun getColorPalette() = runBlocking {
+        val response = client.star.getColorPalette(
+            url = "https://b.hatena.ne.jp/",
+            date = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+        )
+        println(Json.encodeToString(response))
     }
 }
