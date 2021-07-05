@@ -66,9 +66,9 @@ sealed class HatenaClientBase {
             )
             .client(okHttpClient)
 
-    protected val retrofitForBookmark by lazy { retrofitBuilder(baseUrlB).build() }
+    protected val retrofitForBookmark : Retrofit by lazy { retrofitBuilder(baseUrlB).build() }
 
-    protected val retrofitForStar by lazy { retrofitBuilder(baseUrlS).build() }
+    protected val retrofitForStar : Retrofit by lazy { retrofitBuilder(baseUrlS).build() }
 
     // ------ //
 
