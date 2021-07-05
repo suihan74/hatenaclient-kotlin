@@ -50,10 +50,38 @@ interface BookmarkService {
 
     // ------ //
 
+    /**
+     * 指定URLのブクマ数を取得する
+     *
+     * 最大50件まで一度の通信で取得できるので、50件ずつ別々のリクエストを送出するように拡張関数を用意する
+     * @see BookmarkService.getBookmarksCount
+     */
     @GET("https://bookmark.hatenaapis.com/count/entries")
     suspend fun __getBookmarksCount(
         @Query("url") urls: List<String>
     ) : Map<String, Int>
+}
+
+/**
+ * `EntryService#getHistoricalEntries`と処理共有するため分けた
+ */
+@OptIn(ExperimentalCoroutinesApi::class)
+internal suspend fun getBookmarksCountImpl(
+    urls: List<String>,
+    provider: suspend (List<String>)->Map<String,Int>
+) : Map<String, Int> = coroutineScope {
+    val windowSize = 50
+    val tasks = urls
+        .distinct()
+        .windowed(size = windowSize, step = windowSize, partialWindows = true)
+        .map {
+            async { provider(it) }
+        }
+    tasks.awaitAll()
+
+    return@coroutineScope HashMap<String, Int>().also { result ->
+        tasks.forEach { result.putAll(it.getCompleted()) }
+    }
 }
 
 /**
@@ -62,20 +90,8 @@ interface BookmarkService {
  * @return {"url": count} のマップ
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-suspend fun BookmarkService.getBookmarksCount(urls: List<String>) : Map<String, Int> = coroutineScope {
-    val windowSize = 50
-    val tasks = urls
-        .distinct()
-        .windowed(size = windowSize, step = windowSize, partialWindows = true)
-        .map {
-            async { __getBookmarksCount(it) }
-        }
-    tasks.awaitAll()
-
-    return@coroutineScope HashMap<String, Int>().also { result ->
-        tasks.forEach { result.putAll(it.getCompleted()) }
-    }
-}
+suspend fun BookmarkService.getBookmarksCount(urls: List<String>) : Map<String, Int> =
+    getBookmarksCountImpl(urls) { __getBookmarksCount(it) }
 
 /**
  * 対象URLについたブクマ数を取得する

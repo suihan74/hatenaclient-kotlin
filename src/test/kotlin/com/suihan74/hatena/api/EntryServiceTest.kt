@@ -268,4 +268,58 @@ class EntryServiceTest : AccountServiceTestCredentials() {
         val entries = client.entry.getUserHistoricalEntries(year = 2020)
         entries.forEach { println(it) }
     }
+
+    @Test
+    fun getHatenaHistoricalEntries() = runBlocking {
+        val entries = HatenaClient.entry.getHistoricalEntries(year = 2020)
+        entries.forEach { println(it) }
+    }
+
+    @Test
+    fun getHatenaHistoricalEntries_failureCase_over_2020() = runBlocking {
+        val result = runCatching {
+            val entries = HatenaClient.entry.getHistoricalEntries(year = 2021)
+            entries.forEach { println(it) }
+        }.onSuccess {
+            error("a case where failure is expected has been succeeded.")
+        }.onFailure {
+            it.printStackTrace()
+        }
+    }
+
+    @Test
+    fun getHatenaHistoricalEntries_failureCase_under_2005() = runBlocking {
+        val result = runCatching {
+            val entries = HatenaClient.entry.getHistoricalEntries(year = 2004)
+            entries.forEach { println(it) }
+        }.onSuccess {
+            error("a case where failure is expected has been succeeded.")
+        }.onFailure {
+            it.printStackTrace()
+        }
+    }
+
+    @Test
+    fun getHatenaHistoricalEntries_failureCase_zero() = runBlocking {
+        val result = runCatching {
+            val entries = HatenaClient.entry.getHistoricalEntries(year = 0)
+            entries.forEach { println(it) }
+        }.onSuccess {
+            error("a case where failure is expected has been succeeded.")
+        }.onFailure {
+            it.printStackTrace()
+        }
+    }
+
+    @Test
+    fun getHatenaHistoricalEntries_failureCase_under_zero() = runBlocking {
+        val result = runCatching {
+            val entries = HatenaClient.entry.getHistoricalEntries(year = -1)
+            entries.forEach { println(it) }
+        }.onSuccess {
+            error("a case where failure is expected has been succeeded.")
+        }.onFailure {
+            it.printStackTrace()
+        }
+    }
 }

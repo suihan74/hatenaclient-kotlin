@@ -15,7 +15,7 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 class StarServiceTest : AccountServiceTestCredentials() {
-    private lateinit var client : CertifiedHatenaClient
+    private var client : CertifiedHatenaClient
 
     init {
         runBlocking {

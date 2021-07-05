@@ -101,6 +101,37 @@ interface EntryService {
         @Query("limit") limit: Int? = null,
         @Query("of") offset: Int? = null
     ) : UserEntryResponse
+
+    // ------ //
+
+    /**
+     * 指定URLのブクマ数を取得する（同時最大50件）
+     *
+     * ユーザーが利用するために同一のAPIを`BookmarkService`にも用意しているが、
+     * 当クラスのものは`EntryService#getHistoricalEntries`で使用するためのもの
+     */
+    @GET("https://bookmark.hatenaapis.com/count/entries")
+    suspend fun __getBookmarksCount(
+        @Query("url") urls: List<String>
+    ) : Map<String, Int>
+
+    /**
+     * 15周年ページのはてな全体の過去人気エントリリストを取得する
+     *
+     * ブクマ数は別途取得する必要がある
+     */
+    @GET("15th/entries/{year}.json")
+    suspend fun __getHistoricalEntries(
+        @Path("year") year: Int
+    ) : HatenaHistoricalEntry
+}
+
+suspend fun EntryService.getHistoricalEntries(year: Int) : List<Entry> {
+    val entries = __getHistoricalEntries(year).entries
+    val bookmarksCounts = getBookmarksCountImpl(entries.map { it.canonicalUrl }) { __getBookmarksCount(it) }
+    return entries.map { entry ->
+        entry.toEntry(count = bookmarksCounts.getOrDefault(entry.canonicalUrl, 0))
+    }
 }
 
 /**
