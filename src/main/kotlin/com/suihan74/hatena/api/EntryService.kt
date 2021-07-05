@@ -128,7 +128,7 @@ interface EntryService {
 
 suspend fun EntryService.getHistoricalEntries(year: Int) : List<Entry> {
     val entries = __getHistoricalEntries(year).entries
-    val bookmarksCounts = getBookmarksCountImpl(entries.map { it.canonicalUrl }) { __getBookmarksCount(it) }
+    val bookmarksCounts = HatenaClient.bookmark.getBookmarksCount(entries.map { it.canonicalUrl })
     return entries.map { entry ->
         entry.toEntry(count = bookmarksCounts.getOrDefault(entry.canonicalUrl, 0))
     }

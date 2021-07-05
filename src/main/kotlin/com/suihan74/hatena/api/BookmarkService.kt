@@ -63,19 +63,18 @@ interface BookmarkService {
 }
 
 /**
- * `EntryService#getHistoricalEntries`と処理共有するため分けた
+ * 対象URLについたブクマ数を取得する
+ *
+ * @return {"url": count} のマップ
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-internal suspend fun getBookmarksCountImpl(
-    urls: List<String>,
-    provider: suspend (List<String>)->Map<String,Int>
-) : Map<String, Int> = coroutineScope {
+suspend fun BookmarkService.getBookmarksCount(urls: List<String>) : Map<String, Int> = coroutineScope {
     val windowSize = 50
     val tasks = urls
         .distinct()
         .windowed(size = windowSize, step = windowSize, partialWindows = true)
         .map {
-            async { provider(it) }
+            async { __getBookmarksCount(it) }
         }
     tasks.awaitAll()
 
@@ -83,15 +82,6 @@ internal suspend fun getBookmarksCountImpl(
         tasks.forEach { result.putAll(it.getCompleted()) }
     }
 }
-
-/**
- * 対象URLについたブクマ数を取得する
- *
- * @return {"url": count} のマップ
- */
-@OptIn(ExperimentalCoroutinesApi::class)
-suspend fun BookmarkService.getBookmarksCount(urls: List<String>) : Map<String, Int> =
-    getBookmarksCountImpl(urls) { __getBookmarksCount(it) }
 
 /**
  * 対象URLについたブクマ数を取得する
