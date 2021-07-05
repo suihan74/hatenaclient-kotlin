@@ -322,4 +322,35 @@ class EntryServiceTest : AccountServiceTestCredentials() {
             it.printStackTrace()
         }
     }
+
+    @Test
+    fun getPageTitle() = runBlocking {
+        val url = "https://suihan74.github.io/"
+        val title = HatenaClient.entry.getPageTitle(url)
+        val expectedTitle = "すいはんぶろぐ.io"
+        assertEquals(expectedTitle, title)
+        println("url: $url, title: $title")
+    }
+
+    @Test
+    fun getPageTitle_failureCase_unknownHost() = runBlocking {
+        val result = runCatching {
+            val url = "https://suihan74.github.ioooooooooooooooooooooo/"
+            val title = HatenaClient.entry.getPageTitle(url)
+            error("url: $url, title: $title")
+        }.onFailure {
+            it.printStackTrace()  // UnknownHostException
+        }
+    }
+
+    @Test
+    fun getPageTitle_failureCase_unknownPage() = runBlocking {
+        val result = runCatching {
+            val url = "https://suihan74.github.io/hoge"
+            val title = HatenaClient.entry.getPageTitle(url)
+            error("url: $url, title: $title")
+        }.onFailure {
+            it.printStackTrace()  // HttpException
+        }
+    }
 }

@@ -262,6 +262,15 @@ fun EntryService.getEntryUrl(url: String) : String = buildString {
     )
 }
 
+/**
+ * 対象ページのタイトルを取得する
+ */
+suspend fun EntryService.getPageTitle(url: String) : String =
+    HatenaClient.generalService.getHtml(url) { doc ->
+        val titleTag = doc.getElementsByTag("title").firstOrNull()
+        titleTag?.wholeText().orEmpty()
+    }
+
 // ------ //
 
 /**
