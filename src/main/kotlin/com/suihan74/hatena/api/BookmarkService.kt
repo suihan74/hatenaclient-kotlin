@@ -1,9 +1,7 @@
 package com.suihan74.hatena.api
 
-import com.suihan74.hatena.bookmark.BookmarkResult
-import com.suihan74.hatena.bookmark.BookmarksDigest
-import com.suihan74.hatena.bookmark.BookmarksEntry
-import com.suihan74.hatena.bookmark.BookmarksResponse
+import com.suihan74.hatena.bookmark.*
+import com.suihan74.hatena.exception.HttpException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -60,6 +58,14 @@ interface BookmarkService {
     suspend fun __getBookmarksCount(
         @Query("url") urls: List<String>
     ) : Map<String, Int>
+
+    /**
+     * 指定URLに対するユーザーのブクマに紐づいたツイートとそのクリック数を取得する
+     */
+    @POST("api/internal/bookmarks/tweets_and_clicks")
+    suspend fun __getTweetsAndClicks(
+        @Body requestBody: TweetsAndClicksRequestBody
+    ) : List<TweetsAndClicks>
 }
 
 /**
@@ -91,6 +97,50 @@ suspend fun BookmarkService.getBookmarksCount(urls: List<String>) : Map<String, 
 suspend fun BookmarkService.getBookmarksCount(url: String) : Int {
     val map = __getBookmarksCount(listOf(url))
     return map[url] ?: 0
+}
+
+/**
+ * ユーザーのツイートとそのクリック数を取得する(ユーザー固定、URL複数)
+ *
+ * @param user 対象ユーザー
+ * @param urls 対象URL
+ * @return ブクマに紐づいたツイートのアドレスとそのクリック数．count=0の項目は含まれない
+ * @throws HttpException
+ */
+suspend fun BookmarkService.getTweetsAndClicks(
+    user: String,
+    urls: List<String>
+) : List<TweetsAndClicks> {
+    if (urls.isEmpty()) {
+        return emptyList()
+    }
+
+    val requestBody = TweetsAndClicksRequestBody(
+        urls.map { TweetsAndClicksRequestBodyItem(url = it, user = user) }
+    )
+    return __getTweetsAndClicks(requestBody)
+}
+
+/**
+ * ユーザーのツイートとそのクリック数を取得する(ユーザー複数、URL固定)
+ *
+ * @param users 対象ユーザー
+ * @param url 対象URL
+ * @return ブクマに紐づいたツイートのアドレスとそのクリック数．count=0の項目は含まれない
+ * @throws HttpException
+ */
+suspend fun BookmarkService.getTweetsAndClicks(
+    users: List<String>,
+    url: String
+) : List<TweetsAndClicks> {
+    if (users.isEmpty()) {
+        return emptyList()
+    }
+
+    val requestBody = TweetsAndClicksRequestBody(
+        users.map { TweetsAndClicksRequestBodyItem(url = url, user = it) }
+    )
+    return __getTweetsAndClicks(requestBody)
 }
 
 // ------ //

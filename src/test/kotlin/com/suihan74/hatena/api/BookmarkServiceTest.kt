@@ -4,6 +4,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.whenever
+import com.suihan74.hatena.bookmark.TweetsAndClicks
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -273,5 +274,83 @@ internal class BookmarkServiceTest {
         urls.forEach {
             println(it + " : " + map[it])
         }
+    }
+
+    @Test
+    fun getBookmarksCount_contains_unknown_url() = runBlocking {
+        val map = HatenaClient.bookmark.getBookmarksCount(listOf(
+            "https://suihan74.github.io/",
+            "hhhhttps://suihan74.github.io/posts/2021/02_04_00_satena_160/"
+        ))
+        println(Json.encodeToString(map))
+    }
+
+    // ------ //
+
+    @Test
+    fun getTweetsAndClicks() = runBlocking {
+        val tweetsAndClicks = HatenaClient.bookmark.getTweetsAndClicks(user = "suihan74", urls = listOf("https://www3.nhk.or.jp/news/html/20210718/k10013145581000.html"))
+        println(Json.encodeToString(tweetsAndClicks))
+    }
+
+    @Test
+    fun getTweetsAndClicks_multiple_urls() = runBlocking {
+        val tweetsAndClicks = HatenaClient.bookmark.getTweetsAndClicks(
+            user = "suihan74",
+            urls = listOf(
+                "https://www3.nhk.or.jp/news/html/20210718/k10013145581000.html",
+                "https://www3.nhk.or.jp/news/html/20210715/k10013141521000.html"
+            )
+        )
+        println(Json.encodeToString(tweetsAndClicks))
+    }
+
+    @Test
+    fun getTweetsAndClicks_multiple_users() = runBlocking {
+        val tweetsAndClicks = HatenaClient.bookmark.getTweetsAndClicks(
+            users = listOf("suihan74", "satenatest"),
+            url = "https://www3.nhk.or.jp/news/html/20210718/k10013145581000.html",
+        )
+        println(Json.encodeToString(tweetsAndClicks))
+    }
+
+    @Test
+    fun getTweetsAndClicks_multiple_urls_contains_no_tweets() = runBlocking {
+        val tweetsAndClicks = HatenaClient.bookmark.getTweetsAndClicks(
+            user = "suihan74",
+            urls = listOf(
+                "https://www3.nhk.or.jp/news/html/20210718/k10013145581000.html",
+                "https://www3.nhk.or.jp/news/html/20210715/k10013141521000.html",
+                "https://anond.hatelabo.jp/20210711034748"
+            )
+        )
+        println(Json.encodeToString(tweetsAndClicks))
+    }
+
+    @Test
+    fun getTweetsAndClicks_unknown_user() = runBlocking {
+        val tweetsAndClicks = HatenaClient.bookmark.getTweetsAndClicks(
+            user = "suihan74444444444444444444444444",
+            urls = listOf("https://www3.nhk.or.jp/news/html/20210718/k10013145581000.html")
+        )
+        println(Json.encodeToString(tweetsAndClicks))
+    }
+
+    @Test
+    fun getTweetsAndClicks_empty_urls() = runBlocking {
+        val tweetsAndClicks = HatenaClient.bookmark.getTweetsAndClicks(
+            user = "suihan74",
+            urls = listOf()
+        )
+        assertEquals(emptyList<TweetsAndClicks>(), tweetsAndClicks)
+    }
+
+    @Test
+    fun getTweetsAndClicks_empty_users() = runBlocking {
+        val tweetsAndClicks = HatenaClient.bookmark.getTweetsAndClicks(
+            users = listOf(),
+            url = "https://www3.nhk.or.jp/news/html/20210718/k10013145581000.html"
+        )
+        assertEquals(emptyList<TweetsAndClicks>(), tweetsAndClicks)
     }
 }
