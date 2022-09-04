@@ -3,6 +3,7 @@ package com.suihan74.hatena.entry
 import com.suihan74.hatena.api.HatenaClient
 import com.suihan74.hatena.bookmark.BookmarkResult
 import com.suihan74.hatena.extension.toUserIconUrl
+import com.suihan74.hatena.serializer.BooleanAsBinarySerializer
 import com.suihan74.hatena.serializer.InstantISO8601Serializer
 import com.suihan74.hatena.star.StarCount
 import kotlinx.serialization.SerialName
@@ -33,8 +34,12 @@ sealed class Entry {
 
     abstract val ampUrl : String?
 
+    abstract val bookmarksOfFollowings : List<BookmarkResult>
+
     // ユーザーがブクマしている場合のみ取得
     abstract val bookmarkedData : BookmarkResult?
+
+    abstract val isPr : Boolean
 
     abstract val createdAt : Instant
 
@@ -59,7 +64,7 @@ sealed class Entry {
     }
 
     val faviconUrl : String by lazy {
-        _faviconUrl ?: TEMP_FAVICON_URL_BASE + URI.create(url).host
+        _faviconUrl ?: (TEMP_FAVICON_URL_BASE + URI.create(url).host)
     }
 
     // ------ //
@@ -107,6 +112,9 @@ data class EntryItem(
     @SerialName("amp_url")
     override val ampUrl : String? = null,
 
+    @SerialName("bookmarks_of_followings")
+    override val bookmarksOfFollowings : List<BookmarkResult> = emptyList(),
+
     // ユーザーがブクマしている場合のみ取得
     @SerialName("bookmarked_data")
     override val bookmarkedData : BookmarkResult? = null,
@@ -117,6 +125,10 @@ data class EntryItem(
     // ホットエントリにのみ含まれる情報
     @SerialName("myhotentry_comments")
     val myHotEntryComments : List<BookmarkResult>? = null,
+
+    @SerialName("is_pr")
+    @Serializable(with = BooleanAsBinarySerializer::class)
+    override val isPr : Boolean = false,
 
     // BookmarkedEntriesに含まれる
     @SerialName("is_wiped")
@@ -177,9 +189,15 @@ data class IssueEntry(
     @SerialName("amp_url")
     override val ampUrl : String? = null,
 
+    @SerialName("bookmarks_of_followings")
+    override val bookmarksOfFollowings : List<BookmarkResult> = emptyList(),
+
     // ユーザーがブクマしている場合のみ取得
     @SerialName("bookmarked_data")
     override val bookmarkedData : BookmarkResult? = null,
+
+    @SerialName("is_pr")
+    override val isPr : Boolean = false,
 
 ) : Entry()
 
@@ -218,12 +236,18 @@ data class MyHotEntry(
     @SerialName("amp_url")
     override val ampUrl : String? = null,
 
+    @SerialName("bookmarks_of_followings")
+    override val bookmarksOfFollowings : List<BookmarkResult> = emptyList(),
+
     // ユーザーがブクマしている場合のみ取得
     @SerialName("bookmarked_data")
     override val bookmarkedData : BookmarkResult? = null,
 
     @SerialName("myhotentry_comments")
     val myHotEntryComments: List<BookmarkResult>? = null,
+
+    @SerialName("is_pr")
+    override val isPr : Boolean = false,
 
     // eidが無い場合がある
 
@@ -283,6 +307,9 @@ data class UserEntry(
     @SerialName("amp_url")
     override val ampUrl : String? = null
 
+    @SerialName("bookmarks_of_followings")
+    override val bookmarksOfFollowings : List<BookmarkResult> = emptyList()
+
     @SerialName("bookmarked_data")
     override val bookmarkedData = BookmarkResult(
         user = userName,
@@ -296,4 +323,7 @@ data class UserEntry(
         private = status == "private",
         eid = eid
     )
+
+    @SerialName("is_pr")
+    override val isPr : Boolean = false
 }

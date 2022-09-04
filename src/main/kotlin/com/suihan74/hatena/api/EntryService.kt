@@ -162,8 +162,8 @@ fun EntryService.getFaviconUrl(url: String) : String =
 suspend fun EntryService.getEntryId(url: String) : Long {
     val entryUrl = HatenaClient.getEntryUrl(url)
     return HatenaClient.generalService.getHtml(entryUrl) { html ->
-        html.getElementsByTag("html")!!
-            .first()
+        html.getElementsByTag("html")
+            .first()!!
             .attr("data-entry-eid")
             .toLong()
     }

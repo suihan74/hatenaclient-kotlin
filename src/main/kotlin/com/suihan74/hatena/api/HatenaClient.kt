@@ -4,7 +4,6 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import com.suihan74.hatena.account.Account
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import okhttp3.Interceptor
 import okhttp3.JavaNetCookieJar
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -130,6 +129,7 @@ abstract class HatenaClientBaseNoCertificationRequired : HatenaClientBase() {
  */
 object HatenaClient : HatenaClientBaseNoCertificationRequired() {
     /** サインインが必要なAPIが使用できるインスタンスを作成する */
+    @Deprecated("", replaceWith = ReplaceWith("signIn(rk: String)"))
     override suspend fun signIn(name: String, password: String) = CertifiedHatenaClient.createInstance(name, password)
 
     /** Cookieを利用して再ログイン */
@@ -156,14 +156,12 @@ object HatenaClient : HatenaClientBaseNoCertificationRequired() {
  * サインイン状態で使用できるAPI群
  */
 class CertifiedHatenaClient internal constructor() : HatenaClientBase() {
-    val cookieManager by lazy {
-        CookieManager().apply {
-            setCookiePolicy(CookiePolicy.ACCEPT_ALL)
-        }
+    val cookieManager = CookieManager().apply {
+        setCookiePolicy(CookiePolicy.ACCEPT_ALL)
     }
 
     /** 認証情報(サインイン済みのとき値が入る。それ以外ではnull) */
-    val rk : HttpCookie?
+    private val rk : HttpCookie?
         get() = cookieManager.cookieStore.cookies.firstOrNull {
             it.domain == ".hatena.ne.jp" && it.name == "rk"
         }

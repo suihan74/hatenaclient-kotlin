@@ -1,5 +1,6 @@
 package com.suihan74.hatena.api
 
+import com.suihan74.hatena.exception.HttpException
 import com.suihan74.hatena.exception.InvalidResponseException
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -11,7 +12,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
-import com.suihan74.hatena.exception.HttpException
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.mock.BehaviorDelegate
@@ -105,7 +105,7 @@ class GeneralServiceTest {
         """.trimIndent()
 
         mockService.getHtml("https://localhost/") { doc ->
-            val html = doc.getElementsByTag("html").first()
+            val html = doc.getElementsByTag("html").first()!!
             val head = html.getElementsByTag("head").first()
             val body = html.getElementsByTag("body").first()
         }
@@ -119,7 +119,7 @@ class GeneralServiceTest {
 
         runCatching {
             mockService.getHtml("https://localhost/") { doc ->
-                val html = doc.getElementsByTag("html").first()
+                val html = doc.getElementsByTag("html").first()!!
                 val head = html.getElementsByTag("head").first()
                 val body = html.getElementsByTag("body").first()
             }
@@ -144,12 +144,12 @@ class GeneralServiceTest {
 
         runCatching {
             mockService.getHtml("https://localhost/") { doc ->
-                val html = doc.getElementsByTag("html").first()
+                val html = doc.getElementsByTag("html").first()!!
                 val head = html.getElementsByTag("head").first()
                 val body = html.getElementsByTag("body").first()
 
                 // element not found
-                val content = body.getElementById("content")!!
+                val content = body!!.getElementById("content")!!
             }
         }.onSuccess {
             fail()

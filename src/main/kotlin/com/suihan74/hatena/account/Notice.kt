@@ -53,7 +53,7 @@ data class Notice(
         val user : String,
 
         @Serializable(with = StarColorSerializer::class)
-        val color : StarColor
+        val color : StarColor = StarColor.YELLOW
     )
 
     // ------ //
