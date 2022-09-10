@@ -1,5 +1,6 @@
 package com.suihan74.hatena.api
 
+import com.suihan74.hatena.api.HatenaClient.baseUrlB
 import com.suihan74.hatena.entry.*
 import com.suihan74.hatena.exception.HttpException
 import com.suihan74.hatena.exception.InvalidResponseException
@@ -8,7 +9,11 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 import java.net.URI
+import java.net.URLDecoder
 import java.net.URLEncoder
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 /**
  * エントリ関連のAPI
@@ -126,6 +131,98 @@ interface EntryService {
     ) : HatenaHistoricalEntry
 }
 
+/**
+ * 指定サイトのエントリリストを取得する
+ */
+suspend fun EntryService.getSiteEntries(
+    url: String,
+    entriesType: EntriesType,
+    all: Boolean = false,
+    page: Int = 1
+) : List<Entry> {
+    val sort = when (entriesType) {
+        EntriesType.RECENT -> if (all) "eid" else ""
+        EntriesType.HOT -> "count"
+    }
+    val apiUrl = buildString {
+        append(
+            "${baseUrlB}entrylist?url=${URLEncoder.encode(url, "UTF-8")}",
+            "&page=$page",
+            "&sort=$sort"
+        )
+    }
+
+    return HatenaClient.generalService.getHtml(apiUrl) { html ->
+        val anondRootUrl = "https://anond.hatelabo.jp/"
+        val anondImageUrl = "https://cdn-ak-scissors.b.st-hatena.com/image/square/abf4f339344e96f39ffb9c18856eca5d454e63f8/height=280;version=1;width=400/https%3A%2F%2Fanond.hatelabo.jp%2Fimages%2Fog-image-1500.gif"
+
+        val countRegex = Regex("""(\d+)\s*users""")
+        val thumbnailRegex = Regex("""background-image:url\('(.+)'\);""")
+        val rootUrlRegex = Regex("""^/site/""")
+        val classNamePrefix = "entrylist-contents"
+        val dateTimeFormat = DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm")
+
+        html.body().getElementsByClass("$classNamePrefix-main").mapNotNull m@ { entry ->
+            val (title, entryUrl, eid) = entry.getElementsByClass("$classNamePrefix-title").firstOrNull()?.let {
+                it.getElementsByTag("a").firstOrNull()?.let { link ->
+                    Triple(
+                        link.attr("title"),
+                        link.attr("href"),
+                        link.attr("data-entry-id").toLongOrNull()
+                    )
+                }
+            } ?: return@m null
+
+            val count = entry.getElementsByClass("$classNamePrefix-users").firstOrNull()?.let {
+                countRegex.find(it.wholeText())?.groupValues?.get(1)?.toIntOrNull()
+            } ?: return@m null
+
+            val scheme =
+                if (entryUrl.startsWith("https://")) "https://"
+                else "http://"
+
+            val rootUrl =
+                entry.getElementsByAttributeValue("data-gtm-click-label", "entry-info-root-url")
+                    .firstOrNull()
+                    ?.attr("href")
+                    ?.let { path -> URLDecoder.decode(rootUrlRegex.replaceFirst(path, scheme), "UTF-8") }
+                    ?: entryUrl
+
+            val faviconUrl = entry.getElementsByClass("favicon").firstOrNull()?.attr("src") ?: ""
+
+            val (description, imageUrl) = entry.getElementsByClass("$classNamePrefix-body").firstOrNull()?.let {
+                val description = it.wholeText() ?: ""
+                val imageUrl = it.getElementsByAttributeValue("data-gtm-click-label", "entry-info-thumbnail").firstOrNull()?.attr("style")?.let { style ->
+                    thumbnailRegex.find(style)?.groupValues?.get(1)
+                } ?: if (rootUrl == anondRootUrl) anondImageUrl else ""
+
+                description to imageUrl
+            } ?: ("" to "")
+
+            val date = entry.getElementsByClass("$classNamePrefix-date").firstOrNull()?.let {
+                val text = it.wholeText() ?: return@let null
+                runCatching {
+                    LocalDateTime.parse(text, dateTimeFormat).toInstant(ZoneOffset.ofHours(9))
+                }.getOrNull()
+            } ?: return@m null
+
+            EntryItem(
+                eid = eid ?: 0L,
+                title = title,
+                description = description,
+                count = count,
+                url = entryUrl,
+                _rootUrl = rootUrl,
+                _faviconUrl = faviconUrl,
+                _imageUrl = imageUrl,
+                createdAt = date
+            )
+        }
+    }
+}
+
+// ------ //
+
 suspend fun EntryService.getHistoricalEntries(year: Int) : List<Entry> {
     val entries = __getHistoricalEntries(year).entries
     val bookmarksCounts = HatenaClient.bookmark.getBookmarksCount(entries.map { it.canonicalUrl })
@@ -133,6 +230,8 @@ suspend fun EntryService.getHistoricalEntries(year: Int) : List<Entry> {
         entry.toEntry(count = bookmarksCounts.getOrDefault(entry.canonicalUrl, 0))
     }
 }
+
+// ------ //
 
 /**
  * 指定ユーザーがブクマしたエントリを取得する
@@ -143,6 +242,8 @@ suspend fun EntryService.getBookmarkedEntries(
     limit: Int? = null,
     offset: Int? = null
 ) : List<UserEntry> = __getBookmarkedEntries(user, tag, limit, offset).bookmarks
+
+// ------ //
 
 /**
  * 与えられたページのfaviconのURLを取得する

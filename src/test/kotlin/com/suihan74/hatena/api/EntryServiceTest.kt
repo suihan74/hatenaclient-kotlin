@@ -353,4 +353,14 @@ class EntryServiceTest : AccountServiceTestCredentials() {
             it.printStackTrace()  // HttpException
         }
     }
+
+    @Test
+    fun getSiteEntries() = runBlocking {
+        val entries = HatenaClient.entry.getSiteEntries(
+            url = "https://anond.hatelabo.jp/",
+            entriesType = EntriesType.HOT
+        )
+        assert(entries.isNotEmpty()) { "取得できていない" }
+        entries.forEach { println(it) }
+    }
 }
