@@ -363,4 +363,26 @@ class EntryServiceTest : AccountServiceTestCredentials() {
         assert(entries.isNotEmpty()) { "取得できていない" }
         entries.forEach { println(it) }
     }
+
+    @Test
+    fun getEntry_from_eid() = runBlocking {
+        val eid = 4725889401173682691
+        val entry = HatenaClient.entry.getEntry(eid)
+        assertEquals(eid, entry.eid)
+    }
+
+    @Test
+    fun getEntry_from_valid_url() = runBlocking {
+        val eid = 4725889401173682691
+        val url = "https://anond.hatelabo.jp/20220928094843"
+        val entry = HatenaClient.entry.getEntry(url)
+        assertEquals(eid, entry.eid)
+    }
+
+    @Test
+    fun getEntry_from_invalid_url() = runBlocking {
+        val url = "https://github.com/suihan74/Satena/blob/main/app/src/main/java/com/suihan74/hatenaLib/HatenaClient.kt"
+        val entry = HatenaClient.entry.getEntry(url)
+        assertEquals(0L, entry.eid)
+    }
 }

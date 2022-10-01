@@ -11,6 +11,7 @@ import retrofit2.http.Query
 import java.net.URI
 import java.net.URLDecoder
 import java.net.URLEncoder
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -130,6 +131,124 @@ interface EntryService {
         @Path("year") year: Int
     ) : HatenaHistoricalEntry
 }
+
+// ------ //
+
+/**
+ * 指定URLのエントリを取得する
+ */
+suspend fun EntryService.getEntry(url: String) : Entry = runCatching {
+    val commentPageUrl = HatenaClient.getEntryUrl(url)
+    getEntryImpl(commentPageUrl)
+}.getOrDefault(createDummyEntry(url))
+
+/**
+ * 指定エントリIDのエントリを取得する
+ */
+suspend fun EntryService.getEntry(eid: Long) : Entry = runCatching {
+    val commentPageUrl = "${baseUrlB}entry/$eid"
+    getEntryImpl(commentPageUrl)
+}.getOrDefault(createDummyEntry("${baseUrlB}entry/$eid")) // TODO
+
+private suspend fun getEntryImpl(commentPageUrl: String) : Entry {
+    return HatenaClient.generalService.getHtml(commentPageUrl) { html ->
+        val root = html.getElementsByTag("html").first()!!
+        val eid = root.attr("data-entry-eid").toLong()
+        val count = root.attr("data-bookmark-count").toInt()
+        val entryUrl = root.attr("data-entry-url")
+        val createdAt =
+            LocalDateTime.from(
+                DateTimeFormatter.ISO_ZONED_DATE_TIME
+                    .parse(root.attr("data-entry-created"))
+            ).toInstant(ZoneOffset.ofHours(9))
+        val imageUrl = html.head().getElementsByTag("meta")
+            .firstOrNull { it.attr("property") == "og:image" || it.attr("name") == "twitter:image:src" }
+            ?.attr("content")
+            ?: ""
+        val title = html.getElementsByClass("entry-info-title").firstOrNull()?.text() ?: entryUrl
+        val domainElement = html.getElementsByAttributeValue("data-gtm-label", "entry-info-domain").firstOrNull()
+        val rootUrl = domainElement?.text()
+        val faviconUrl = domainElement?.getElementsByTag("img")?.firstOrNull()?.attr("src")
+        val description = html.getElementsByClass("entry-about-description").firstOrNull()?.text() ?: ""
+
+        EntryItem(
+            eid = eid,
+            title = title,
+            description = description,
+            count = count,
+            url = entryUrl,
+            _rootUrl = rootUrl,
+            _faviconUrl = faviconUrl,
+            _imageUrl = imageUrl,
+            createdAt = createdAt
+        )
+    }
+}
+
+/**
+ * ブクマが付いていないページのエントリ情報を捏造する
+ */
+suspend fun EntryService.createDummyEntry(url: String) : Entry {
+    return runCatching {
+        HatenaClient.generalService.getHtmlDetectedCharset(url) { doc ->
+            val isCommentPage =
+                Regex("""^${baseUrlB}entry/\d+/comment/\S+$""")
+                    .matches(url)
+            val allElements = doc.allElements
+
+            val pageTitle =
+                doc.select("title").html().let { title ->
+                    if (title.isNullOrEmpty()) url else title
+                }
+
+            val title =
+                if (isCommentPage) pageTitle
+                else allElements.firstOrNull { it.tagName() == "meta" && it.attr("property") == "og:title" }
+                    ?.attr("content")
+                    ?: pageTitle
+
+            val description =
+                allElements.firstOrNull { it.tagName() == "meta" && it.attr("property") == "og:description" }
+                    ?.attr("content")
+                    ?: ""
+
+            val actualUrl =
+                if (isCommentPage) url
+                else allElements.firstOrNull { it.tagName() == "meta" && it.attr("property") == "og:url" }
+                    ?.attr("content")
+                    ?: url
+
+            val imageUrl =
+                allElements.firstOrNull { it.tagName() == "meta" && it.attr("property") == "og:image" }
+                    ?.attr("content")
+                    ?: ""
+
+            EntryItem(
+                eid = 0L,
+                title = title,
+                description = description,
+                count = 0,
+                url = actualUrl,
+                createdAt = Instant.now(),
+                _imageUrl = imageUrl
+            )
+        }
+    }.getOrElse {
+        EntryItem(
+            eid = 0,
+            title = "",
+            description = "",
+            count = 0,
+            createdAt = Instant.MIN,
+            url = url,
+            _rootUrl = null,
+            _faviconUrl = null,
+            _imageUrl = null
+        )
+    }
+}
+
+// ------ //
 
 /**
  * 指定サイトのエントリリストを取得する
