@@ -2,7 +2,6 @@ package com.suihan74.hatena.star
 
 import com.suihan74.hatena.serializer.StarColorSerializer
 import kotlinx.serialization.Serializable
-import java.util.*
 
 /**
  * スターカラー
@@ -18,8 +17,8 @@ enum class StarColor {
 
     companion object {
         fun fromName(name: String) : StarColor {
-            val nameLower = name.lowercase()
-            return values().firstOrNull { it.name == nameLower } ?: YELLOW
+            val nameUpper = name.uppercase()
+            return values().firstOrNull { it.name == nameUpper } ?: YELLOW
         }
     }
 }
