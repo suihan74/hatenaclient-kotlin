@@ -130,6 +130,15 @@ interface EntryService {
     suspend fun __getHistoricalEntries(
         @Path("year") year: Int
     ) : HatenaHistoricalEntry
+
+    /**
+     * 関連エントリを取得する
+     */
+    @GET("api/ipad.related_entry.json")
+    suspend fun getRelatedEntries(
+        @Query("url") url: String,
+        @Query("ad") ad: Boolean = false
+    ) : RelatedEntriesResponse
 }
 
 // ------ //

@@ -385,4 +385,11 @@ class EntryServiceTest : AccountServiceTestCredentials() {
         val entry = HatenaClient.entry.getEntry(url)
         assertEquals(0L, entry.eid)
     }
+
+    @Test
+    fun getRelatedEntries() = runBlocking {
+        val url = "https://b.hatena.ne.jp/"
+        val relatedEntries = HatenaClient.entry.getRelatedEntries(url)
+        assert(relatedEntries.entries.isNotEmpty())
+    }
 }
