@@ -316,6 +316,7 @@ data class UserEntry(
         userIconUrl = userName.toUserIconUrl,
         comment = comment.body,
         commentRaw = comment.raw,
+        commentExpanded = comment.body,
         tags = comment.tags,
         timestamp = createdAt,
         permalink = "https://b.hatena.ne.jp/entry/%d/comment/%s".format(eid, userName),

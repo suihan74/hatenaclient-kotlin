@@ -43,6 +43,9 @@ data class BookmarkResult (
 
     val eid : Long? = null,
 
+    @SerialName("comment_expanded")
+    val commentExpanded : String = comment,
+
     @SerialName("star_count")
     val starsCount : List<Star>? = null
 )

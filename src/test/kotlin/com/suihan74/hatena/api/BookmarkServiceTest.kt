@@ -18,7 +18,7 @@ import org.junit.Test
 import retrofit2.Retrofit
 import java.net.URLEncoder
 
-internal class BookmarkServiceTest {
+internal class BookmarkServiceTest : AccountServiceTestCredentials() {
     private val testUrl = "https://togetter.com/li/1647315"
 
     private fun createMock(responseBuilder: MockWebServer.()->Unit) : Pair<MockWebServer, HatenaClientBase> {
@@ -194,10 +194,10 @@ internal class BookmarkServiceTest {
     @Test
     fun getBookmarksCount_multiUrls() = runBlocking {
         val map = HatenaClient.bookmark.getBookmarksCount(listOf(
-            "https://suihan74.github.io/",
+            "https://suihan74.github.io/hogehoge",
             "https://suihan74.github.io/posts/2021/02_04_00_satena_160/"
         ))
-        assertEquals(0, map["https://suihan74.github.io/"])
+        assertEquals(0, map["https://suihan74.github.io/hogehoge"])
         assertEquals(1, map["https://suihan74.github.io/posts/2021/02_04_00_satena_160/"])
     }
 
@@ -352,5 +352,15 @@ internal class BookmarkServiceTest {
             url = "https://www3.nhk.or.jp/news/html/20210718/k10013145581000.html"
         )
         assertEquals(emptyList<TweetsAndClicks>(), tweetsAndClicks)
+    }
+
+    @Test
+    fun postBookmark() = runBlocking {
+        val url = "https://suihan74.github.io/"
+        val comment = "test"
+        val client = HatenaClient.signIn(rk)
+        val result = client.bookmark.postBookmark(url, comment, private = true)
+        assertEquals(result.user, user)
+        assertEquals(result.comment, comment)
     }
 }
