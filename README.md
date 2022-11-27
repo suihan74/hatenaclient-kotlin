@@ -30,10 +30,6 @@ dependencies {
 
     // HatenaClient
     implementation 'com.github.suihan74:hatenaclient-kotlin:0.0.14'
-
-    // Coroutines
-    def coroutines_version = '1.5.0'
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
 }
 ```
 
