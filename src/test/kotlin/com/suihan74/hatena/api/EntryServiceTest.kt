@@ -392,4 +392,11 @@ class EntryServiceTest : AccountServiceTestCredentials() {
         val relatedEntries = HatenaClient.entry.getRelatedEntries(url)
         assert(relatedEntries.entries.isNotEmpty())
     }
+
+    @Test
+    fun getFollowingEntries() = runBlocking {
+        val client = HatenaClient.signIn(rk)
+        val followingEntries = client.entry.getFollowingEntries()
+        followingEntries.forEach { println(it) }
+    }
 }

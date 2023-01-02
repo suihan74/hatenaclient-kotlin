@@ -546,6 +546,16 @@ interface CertifiedEntryService : EntryService {
         @Query("year") year: Int,
         @Query("limit") limit: Int = 10
     ) : List<UserHistoricalEntry>
+
+    /**
+     * フォロー中ユーザーがブクマしたエントリを取得する
+     */
+    @GET("api/internal/cambridge/user/my/feed/following/bookmarks")
+    suspend fun __getFollowingEntries(
+        @Query("include_amp_urls") includeAmpUrls: Boolean = true,
+        @Query("limit") limit: Int? = null,
+        @Query("offset") offset: Int? = null
+    ) : FollowingEntriesResponse
 }
 
 class CertifiedEntryServiceImpl(delegate : CertifiedEntryService) : CertifiedEntryService by delegate {
@@ -561,4 +571,15 @@ suspend fun CertifiedEntryService.getUserHistoricalEntries(year: Int, limit: Int
     return __getUserHistoricalEntries(year, limit).map {
         it.toEntry(accountName)
     }
+}
+
+/**
+ * フォロー中ユーザーがブクマしたエントリを取得する
+ */
+suspend fun CertifiedEntryService.getFollowingEntries(
+    includeAmpUrls: Boolean = true,
+    limit: Int? = null,
+    offset: Int? = null
+) : List<FollowingEntry> {
+    return __getFollowingEntries(includeAmpUrls, limit, offset).bookmarks
 }

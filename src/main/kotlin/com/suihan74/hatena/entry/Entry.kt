@@ -11,6 +11,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import java.net.URI
 import java.time.Instant
+import java.time.format.DateTimeFormatter
 
 @Serializable
 sealed class Entry {
@@ -328,3 +329,140 @@ data class UserEntry(
     @SerialName("is_pr")
     override val isPr : Boolean = false
 }
+
+// ------ //
+
+/**
+ * フォロー中ユーザーがブクマしているエントリ
+ */
+@SerialName("following_entry")
+@Serializable
+data class FollowingEntry(
+    @SerialName("entry_id")
+    override val eid : Long,
+
+    private val entry : FollowingEntryBody,
+
+    private val user : User,
+
+    @SerialName("user_name")
+    private val userName : String,
+
+    private val comment : BookmarkPageComment,
+
+    val status : String,
+
+    @SerialName("created_at")
+    @Serializable(with = InstantISO8601Serializer::class)
+    private val timestamp : Instant
+) : Entry() {
+
+    override val _entryUrl: String by lazy { HatenaClient.getEntryUrl(url) }
+
+    override val _faviconUrl: String by lazy { entry.faviconUrl }
+
+    override val _imageUrl: String? by lazy { entry.imageUrl }
+
+    override val count: Int by lazy { entry.count }
+
+    override val ampUrl: String? by lazy { entry.ampUrl }
+
+    override val createdAt: Instant by lazy { entry.createdAt }
+
+    override val url: String by lazy { entry.url }
+
+    override val title: String by lazy { entry.title }
+
+    @SerialName("is_pr")
+    override val isPr: Boolean = false
+
+    override val description: String by lazy { entry.content }
+
+    override val _rootUrl: String? = null
+
+    @SerialName("bookmarked_data")
+    override val bookmarkedData: BookmarkResult? = null
+
+    override val bookmarksOfFollowings: List<BookmarkResult> by lazy {
+        listOf(
+            BookmarkResult(
+                user = user.name,
+                comment = comment.body,
+                tags = comment.tags,
+                timestamp = timestamp,
+                userIconUrl = user.profileImageUrl,
+                commentRaw = comment.raw,
+                permalink = permalink,
+                eid = entry.eid
+            )
+        )
+    }
+
+    val permalink: String by lazy {
+        val dateFormat = DateTimeFormatter.ofPattern("uuuuMMdd")
+        val date = dateFormat.format(timestamp)
+        "${HatenaClient.baseUrlB}$user/$date#bookmark-$eid"
+    }
+
+    // ------ //
+
+    @Serializable
+    data class User(
+        val name : String,
+
+        @SerialName("display_name")
+        val displayName : String,
+
+        @SerialName("profile_image_url")
+        val profileImageUrl : String,
+
+        @SerialName("total_bookmarks")
+        val totalBookmarks : Int,
+
+        val private : Boolean
+    )
+
+    @Serializable
+    data class BookmarkPageComment(
+        val body : String,
+        val raw : String,
+        val tags : List<String>
+    )
+
+    @Serializable
+    data class FollowingEntryBody(
+        @SerialName("entry_id")
+        val eid : Long,
+
+        val title : String,
+
+        val content : String,
+
+        @SerialName("total_bookmarks")
+        val count : Int,
+
+        val url : String,
+
+        @SerialName("amp_url")
+        val ampUrl: String? = null,
+
+        @SerialName("favicon_url")
+        val faviconUrl : String,
+
+        @SerialName("image_url")
+        val imageUrl : String?,
+
+        @SerialName("created_at")
+        @Serializable(with = InstantISO8601Serializer::class)
+        val createdAt : Instant,
+
+        @Transient
+        @SerialName("bookmark_by_visitor")
+        val bookmarkByVisitor : String? = null
+    )
+}
+
+@Serializable
+data class FollowingEntriesResponse(
+    val bookmarks: List<FollowingEntry>
+)
