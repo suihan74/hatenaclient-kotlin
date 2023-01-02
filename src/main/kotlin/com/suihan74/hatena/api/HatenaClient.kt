@@ -55,13 +55,16 @@ sealed class HatenaClientBase {
     /** スター関係のAPI */
     abstract val star : StarService
 
+    /** Jsonパース時にコード側で取り扱っていないキーを無視する */
+    protected val json = Json { ignoreUnknownKeys = true }
+
     @OptIn(ExperimentalSerializationApi::class)
     protected fun retrofitBuilder(baseUrl: String) : Retrofit.Builder =
         Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(ObjectParameterConverterFactory)
             .addConverterFactory(
-                Json.asConverterFactory("application/json".toMediaType())
+                json.asConverterFactory("application/json".toMediaType())
             )
             .client(okHttpClient)
 
@@ -142,7 +145,7 @@ object HatenaClient : HatenaClientBaseNoCertificationRequired() {
         Retrofit.Builder()
             .baseUrl("https://localhost/")
             .addConverterFactory(
-                Json.asConverterFactory("application/json".toMediaType())
+                json.asConverterFactory("application/json".toMediaType())
             )
             .client(okHttpClient)
             .build()
