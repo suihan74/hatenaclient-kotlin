@@ -11,6 +11,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import java.net.URI
 import java.time.Instant
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 @Serializable
@@ -339,70 +340,39 @@ data class UserEntry(
 @Serializable
 data class FollowingEntry(
     @SerialName("entry_id")
-    override val eid : Long,
+    val eid : Long,
 
-    private val entry : FollowingEntryBody,
+    val entry : FollowingEntryBody,
 
-    private val user : User,
+    val user : User,
 
     @SerialName("user_name")
-    private val userName : String,
+    val userName : String,
 
-    private val comment : BookmarkPageComment,
+    val comment : BookmarkPageComment,
 
     val status : String,
 
     @SerialName("created_at")
     @Serializable(with = InstantISO8601Serializer::class)
-    private val timestamp : Instant
-) : Entry() {
-
-    override val _entryUrl: String by lazy { HatenaClient.getEntryUrl(url) }
-
-    override val _faviconUrl: String by lazy { entry.faviconUrl }
-
-    override val _imageUrl: String? by lazy { entry.imageUrl }
-
-    override val count: Int by lazy { entry.count }
-
-    override val ampUrl: String? by lazy { entry.ampUrl }
-
-    override val createdAt: Instant by lazy { entry.createdAt }
-
-    override val url: String by lazy { entry.url }
-
-    override val title: String by lazy { entry.title }
-
-    @SerialName("is_pr")
-    override val isPr: Boolean = false
-
-    override val description: String by lazy { entry.content }
-
-    override val _rootUrl: String? = null
-
-    @SerialName("bookmarked_data")
-    override val bookmarkedData: BookmarkResult? = null
-
-    override val bookmarksOfFollowings: List<BookmarkResult> by lazy {
-        listOf(
-            BookmarkResult(
-                user = user.name,
-                comment = comment.body,
-                tags = comment.tags,
-                timestamp = timestamp,
-                userIconUrl = user.profileImageUrl,
-                commentRaw = comment.raw,
-                permalink = permalink,
-                eid = entry.eid
-            )
-        )
-    }
-
-    val permalink: String by lazy {
-        val dateFormat = DateTimeFormatter.ofPattern("uuuuMMdd")
-        val date = dateFormat.format(timestamp)
+    val timestamp : Instant,
+) {
+    private val permalink: String by lazy {
+        val dateFormatter = DateTimeFormatter.ofPattern("uuuuMMdd")
+        val date = dateFormatter.format(timestamp.atOffset(ZoneOffset.ofHours(9)))
         "${HatenaClient.baseUrlB}$user/$date#bookmark-$eid"
     }
+
+    val bookmark = BookmarkResult(
+        user = user.name,
+        comment = comment.body,
+        tags = comment.tags,
+        timestamp = timestamp,
+        userIconUrl = user.profileImageUrl,
+        commentRaw = comment.raw,
+        permalink = permalink,
+        eid = entry.eid
+    )
 
     // ------ //
 

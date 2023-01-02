@@ -580,6 +580,30 @@ suspend fun CertifiedEntryService.getFollowingEntries(
     includeAmpUrls: Boolean = true,
     limit: Int? = null,
     offset: Int? = null
-) : List<FollowingEntry> {
-    return __getFollowingEntries(includeAmpUrls, limit, offset).bookmarks
+) : List<Entry> {
+    val entries = __getFollowingEntries(includeAmpUrls, limit, offset).bookmarks
+        .groupBy { it.eid }
+        .values
+        .map { items ->
+            val bookmarks = buildList {
+                for (item in items) {
+                    add(item.bookmark)
+                }
+            }
+            val item = items[0]
+            EntryItem(
+                title = item.entry.title,
+                url = item.entry.url,
+                eid = item.eid,
+                description = item.entry.content,
+                count = item.entry.count,
+                createdAt = item.entry.createdAt,
+                _entryUrl = HatenaClient.getEntryUrl(item.entry.url),
+                _rootUrl = null,
+                _faviconUrl = item.entry.faviconUrl,
+                _imageUrl = item.entry.imageUrl,
+                bookmarksOfFollowings = bookmarks,
+            )
+        }
+    return entries
 }
