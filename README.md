@@ -29,7 +29,7 @@ dependencies {
     // ...
 
     // HatenaClient
-    implementation 'com.github.suihan74:hatenaclient-kotlin:0.0.14'
+    implementation 'com.github.suihan74:hatenaclient-kotlin:0.0.17'
 }
 ```
 
