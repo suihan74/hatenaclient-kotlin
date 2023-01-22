@@ -5,6 +5,7 @@ import com.suihan74.hatena.entry.*
 import com.suihan74.hatena.exception.HttpException
 import com.suihan74.hatena.exception.InvalidResponseException
 import com.suihan74.hatena.extension.queryParameters
+import org.jsoup.nodes.Element
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -13,6 +14,7 @@ import java.net.URLDecoder
 import java.net.URLEncoder
 import java.time.Instant
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
@@ -501,6 +503,57 @@ suspend fun EntryService.getPageTitle(url: String) : String =
     HatenaClient.generalService.getHtml(url) { doc ->
         val titleTag = doc.getElementsByTag("title").firstOrNull()
         titleTag?.wholeText().orEmpty()
+    }
+
+/**
+ * メンテナンス情報を取得する
+ */
+suspend fun EntryService.getMaintenanceEntries() : List<MaintenanceEntry> {
+    val url = "https://maintenance.hatena.ne.jp"
+    return HatenaClient.generalService.getHtml(url) { doc ->
+        val brRegex = Regex("""<br\w*/?>""")
+
+        runCatching {
+            doc.getElementsByTag("article").mapNotNull { article ->
+                val titleTag = article.getElementsByTag("h2").firstOrNull() ?: return@mapNotNull null
+                val title = titleTag.wholeText()
+                val resolved = title.contains("復旧済")
+                val id = titleTag.id()
+                if (id.isNullOrBlank()) return@mapNotNull null
+
+                val titleLinkTag = article.getElementsByTag("a").firstOrNull() ?: return@mapNotNull null
+                val link = titleLinkTag.attr("href")
+
+                val paragraphs = article.getElementsByTag("p")
+                val paragraph = paragraphs.firstOrNull { !it.hasClass("sectionheader") } ?: return@mapNotNull null
+                val header = paragraphs.firstOrNull { it.hasClass("sectionheader") } ?: return@mapNotNull null
+                val createdAt = parseTimestamp(header, "timestamp") ?: return@mapNotNull null
+                val updatedAt = parseTimestamp(header, "timestamp updated") ?: createdAt
+
+                MaintenanceEntry(
+                    id = id,
+                    title = title,
+                    body = paragraph.html().replace(brRegex, "\n"),
+                    resolved = resolved,
+                    url = url + link,
+                    createdAt = createdAt,
+                    updatedAt = updatedAt
+                )
+            }
+        }.onFailure {
+            throw InvalidResponseException(cause = it)
+        }.getOrThrow()
+    }
+}
+
+private fun parseTimestamp(header: Element, className: String) : Instant? =
+    header.getElementsByClass(className).firstOrNull()?.let {
+        val str = it.getElementsByTag("time").firstOrNull()?.wholeText() ?: return@let null
+        val dateTimeFormatter = DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ss")
+        OffsetDateTime.of(
+            LocalDateTime.parse(str, dateTimeFormatter),
+            ZoneOffset.ofHours(9)
+        ).toInstant()
     }
 
 // ------ //

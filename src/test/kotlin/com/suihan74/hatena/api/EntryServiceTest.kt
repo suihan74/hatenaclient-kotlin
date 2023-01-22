@@ -24,6 +24,18 @@ class EntryServiceTest : AccountServiceTestCredentials() {
         println("====================")
     }
 
+    private fun println(info: MaintenanceEntry) {
+        val offset = ZoneOffset.ofHours(9)
+        println("  title = " + info.title)
+        println("  url = " + info.url)
+        println("  body = " + info.body)
+        println("  resolved = " + info.resolved)
+        println("  createdAt = " + OffsetDateTime.ofInstant(info.createdAt, offset))
+        println("  updatedAt = " + OffsetDateTime.ofInstant(info.updatedAt, offset))
+        println(Json.encodeToString(info))
+        println("====================")
+    }
+
     private suspend fun getEntries(entriesType: EntriesType, category: Category) {
         println("type = " + entriesType.name + " | category = " + category.name)
         HatenaClient.entry.getEntries(entriesType, category).let { entries ->
@@ -420,5 +432,13 @@ class EntryServiceTest : AccountServiceTestCredentials() {
         val client = HatenaClient.signIn(rk)
         val followingEntries = client.entry.getFollowingEntries()
         followingEntries.forEach { println(it) }
+    }
+
+    @Test
+    fun getMaintenanceEntries() = runBlocking {
+        val entries = HatenaClient.entry.getMaintenanceEntries()
+        entries.forEach {
+            println(it)
+        }
     }
 }

@@ -173,7 +173,6 @@ class CertifiedAccountServiceImpl(delegate : CertifiedAccountService) : Certifie
  *
  * @throws HttpException 通信失敗
  */
-@OptIn(ExperimentalStdlibApi::class)
 suspend fun CertifiedAccountService.getIgnoredUsersAll() : IgnoredUsersResponse {
     var cursor: String? = null
     val users = buildList {
