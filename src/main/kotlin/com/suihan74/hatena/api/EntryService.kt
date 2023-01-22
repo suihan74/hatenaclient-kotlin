@@ -88,6 +88,9 @@ interface EntryService {
         @Path("searchType") searchType: SearchType,
         @Query("q") query: String,
         @Query("sort") @EntriesTypeQuery(EntriesTypeUsage.SEARCH_SORT) sortType: EntriesType = EntriesType.RECENT,
+        @Query("date_begin") dateBegin: Instant? = null,
+        @Query("date_end") dateEnd: Instant? = null,
+        @Query("safe") safe: Boolean = false,
         @Query("limit") limit: Int? = null,
         @Query("of") offset: Int? = null,
         @Query("include_bookmarked_data") includeBookmarkedData: Boolean = true
@@ -565,7 +568,7 @@ class CertifiedEntryServiceImpl(delegate : CertifiedEntryService) : CertifiedEnt
 /**
  * ユーザーの15周年タイムカプセルエントリを取得する
  *
- * @param year 2011 ~ 2020
+ * @param year 2005 ~ 2020
  */
 suspend fun CertifiedEntryService.getUserHistoricalEntries(year: Int, limit: Int = 10) : List<Entry> {
     return __getUserHistoricalEntries(year, limit).map {

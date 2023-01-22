@@ -8,6 +8,9 @@ import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Test
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 class EntryServiceTest : AccountServiceTestCredentials() {
     private fun println(entry: Entry) {
@@ -159,6 +162,25 @@ class EntryServiceTest : AccountServiceTestCredentials() {
         val entries = HatenaClient.entry.searchEntries(SearchType.TAG, "test", EntriesType.RECENT)
         entries.forEach {
             println(it.title)
+        }
+    }
+
+    @Test
+    fun searchEntriesWithDateRange() = runBlocking {
+        val formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd")
+        val offset = ZoneOffset.ofHours(9)
+        val dateBegin = OffsetDateTime.of(2022, 12, 1, 0, 0, 0, 0, offset).toInstant()
+        val dateEnd = OffsetDateTime.of(2023, 1, 1, 0, 0, 0, 0, offset).toInstant()
+        val entries = HatenaClient.entry.searchEntries(
+            SearchType.TAG,
+            "test",
+            EntriesType.RECENT,
+            dateBegin = dateBegin,
+            dateEnd = dateEnd
+        )
+        entries.forEach {
+            println("[${formatter.format(it.createdAt.atOffset(offset))}] ${it.title}")
+            assert(it.createdAt.isAfter(dateBegin) && it.createdAt.isBefore(dateEnd))
         }
     }
 

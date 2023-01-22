@@ -7,6 +7,9 @@ import com.suihan74.hatena.star.StarPalette
 import retrofit2.Converter
 import retrofit2.Retrofit
 import java.lang.reflect.Type
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 /**
  * パラメータにオブジェクトを使用するためのコンバータ
@@ -25,6 +28,7 @@ internal object ObjectParameterConverterFactory : Converter.Factory() {
             Boolean::class.java -> BooleanConverter
             StarColor::class.java -> StarColorConverter
             StarPalette::class.java -> StarPaletteConverter
+            Instant::class.java -> InstantConverter
             else -> null
         }
 
@@ -73,5 +77,11 @@ internal object ObjectParameterConverterFactory : Converter.Factory() {
 
     object StarPaletteConverter : Converter<StarPalette, String> {
         override fun convert(value: StarPalette) = value.token
+    }
+
+    object InstantConverter : Converter<Instant, String> {
+        private val formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd")
+        private val offset = ZoneOffset.ofHours(9)
+        override fun convert(value: Instant) : String = value.atOffset(offset).format(formatter)
     }
 }
