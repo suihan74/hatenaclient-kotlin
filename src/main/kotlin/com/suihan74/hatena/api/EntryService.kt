@@ -90,6 +90,7 @@ interface EntryService {
         @Path("searchType") searchType: SearchType,
         @Query("q") query: String,
         @Query("sort") @EntriesTypeQuery(EntriesTypeUsage.SEARCH_SORT) sortType: EntriesType = EntriesType.RECENT,
+        @Query("users") users: Int? = null,
         @Query("date_begin") dateBegin: Instant? = null,
         @Query("date_end") dateEnd: Instant? = null,
         @Query("safe") safe: Boolean = false,
