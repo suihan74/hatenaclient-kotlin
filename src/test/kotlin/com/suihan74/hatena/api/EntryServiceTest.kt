@@ -196,6 +196,19 @@ class EntryServiceTest : AccountServiceTestCredentials() {
         }
     }
 
+    @Test
+    fun searchEntriesWithUsers() = runBlocking {
+        for (users in listOf(3, 100, 1000, 10000)) {
+            val entries = HatenaClient.entry.searchEntries(
+                SearchType.TEXT,
+                "hatena",
+                EntriesType.RECENT,
+                users = users
+            )
+            entries.forEach { assert(it.count >= users) { "${it.count} / $users" } }
+        }
+    }
+
     /*
      * 1) https://b.hatena.ne.jp/entry/s/www.hoge.com/ ==> https://www.hoge.com/
      * 2) https://b.hatena.ne.jp/entry/https://www.hoge.com/ ==> https://www.hoge.com/
