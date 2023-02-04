@@ -177,7 +177,8 @@ interface CertifiedBookmarkService : BookmarkService {
     /**
      * ブックマークを削除する
      */
-    @POST
+    @FormUrlEncoded
+    @POST("{account}/api.delete_bookmark.json")
     suspend fun deleteBookmark(
         @Field("url") url: String,
         @Path("account") accountName: String = this.accountName,

@@ -363,4 +363,13 @@ internal class BookmarkServiceTest : AccountServiceTestCredentials() {
         assertEquals(result.user, user)
         assertEquals(result.comment, comment)
     }
+
+    @Test
+    fun deleteBookmark() = runBlocking {
+        val url = "https://suihan74.github.io/"
+        val comment = "test"
+        val client = HatenaClient.signIn(rk)
+        client.bookmark.postBookmark(url, comment, private = true)
+        client.bookmark.deleteBookmark(url = url)
+    }
 }
