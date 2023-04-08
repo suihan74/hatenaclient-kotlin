@@ -139,7 +139,7 @@ interface CertifiedAccountService : AccountService {
         @Field("username") user: String,
         @Path("account") accountName: String = this.accountName,
         @Field("rks") rks: String = this.rks
-    )
+    ) : Response<Unit>
 
     /**
      * ユーザーを非表示にする
@@ -156,7 +156,7 @@ interface CertifiedAccountService : AccountService {
         @Field("username") user: String,
         @Path("account") accountName: String = this.accountName,
         @Field("rks") rks: String = this.rks
-    )
+    ) : Response<Unit>
 }
 
 // ------- //

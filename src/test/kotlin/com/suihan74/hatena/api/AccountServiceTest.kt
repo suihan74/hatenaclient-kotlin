@@ -10,7 +10,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Test
@@ -167,6 +166,12 @@ internal class AccountServiceTest : AccountServiceTestCredentials() {
         }
 
         server.shutdown()
+    }
+
+    @Test
+    fun ignoreUser(): Unit = runBlocking {
+//        client.user.ignoreUser("")
+//        client.user.unIgnoreUser("")
     }
 
     @Test
