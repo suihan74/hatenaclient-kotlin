@@ -135,11 +135,11 @@ interface CertifiedAccountService : AccountService {
      */
     @FormUrlEncoded
     @POST("{account}/api.ignore.json")
-    suspend fun ignoreUser(
+    suspend fun __ignoreUser(
         @Field("username") user: String,
         @Path("account") accountName: String = this.accountName,
         @Field("rks") rks: String = this.rks
-    ) : UnitResponse
+    ) : Response<Unit>
 
     /**
      * ユーザーを非表示にする
@@ -152,11 +152,11 @@ interface CertifiedAccountService : AccountService {
      */
     @FormUrlEncoded
     @POST("{account}/api.unignore.json")
-    suspend fun unIgnoreUser(
+    suspend fun __unIgnoreUser(
         @Field("username") user: String,
         @Path("account") accountName: String = this.accountName,
         @Field("rks") rks: String = this.rks
-    ) : UnitResponse
+    ) : Response<Unit>
 }
 
 // ------- //
@@ -167,6 +167,27 @@ class CertifiedAccountServiceImpl(delegate : CertifiedAccountService) : Certifie
 }
 
 // ------- //
+
+/**
+ * ユーザーを非表示にする
+ *
+ * @param user 非表示にするユーザーID
+ * @throws HttpException 通信失敗
+ */
+suspend fun CertifiedAccountService.ignoreUser(user: String) {
+    __ignoreUser(user = user)
+}
+
+/**
+ * ユーザーを非表示にする
+ *
+ * @param user 非表示を解除するユーザーID
+ * @throws HttpException code=500: ユーザーが存在しない
+ * @throws HttpException 通信失敗
+ */
+suspend fun CertifiedAccountService.unIgnoreUser(user: String) {
+    __unIgnoreUser(user = user)
+}
 
 /**
  * 非表示ユーザーリストを全件取得
