@@ -39,10 +39,10 @@ dependencies {
     testImplementation "com.squareup.retrofit2:retrofit-mock:$retrofit_version"
 
     // Json
-    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0'
 
     // html parser
-    implementation 'org.jsoup:jsoup:1.15.3'
+    implementation 'org.jsoup:jsoup:1.15.4'
 
     // Testing
     testImplementation 'junit:junit:4.13.2'
