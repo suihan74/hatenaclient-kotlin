@@ -32,7 +32,7 @@ interface GeneralService {
  */
 suspend fun <T> GeneralService.getHtml(
     url: String,
-    parser: (doc: Document)->T
+    parser: suspend (doc: Document)->T
 ) : T = withContext(Dispatchers.IO) {
     val response = get(url)
     if (response.code() != 200) throw HttpException(response)
@@ -54,7 +54,7 @@ suspend fun <T> GeneralService.getHtml(
 
 suspend fun <T> GeneralService.getHtmlDetectedCharset(
     url: String,
-    parser: (doc: Document)->T
+    parser: suspend (doc: Document)->T
 ) : T = withContext(Dispatchers.IO) {
     val response = get(url)
     if (!response.isSuccessful) throw IllegalStateException("")

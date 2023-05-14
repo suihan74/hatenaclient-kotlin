@@ -164,7 +164,7 @@ suspend fun BookmarkService.getBookmark(
     )
 }
 
-private suspend fun getBookmarkImpl(
+internal suspend fun getBookmarkImpl(
     url: String,
     eid: Long,
     user: String,

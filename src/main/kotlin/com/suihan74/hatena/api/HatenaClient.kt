@@ -195,7 +195,10 @@ class CertifiedHatenaClient internal constructor() : HatenaClientBase() {
             it.accountName = accountName
             it.rks = rks
         }
-        (entry as CertifiedEntryServiceImpl).accountName = accountName
+        (entry as CertifiedEntryServiceImpl).let{
+            it.accountName = accountName
+            it.generalService = generalService
+        }
         (bookmark as CertifiedBookmarkServiceImpl).let {
             it.accountName = accountName
             it.rks = rks

@@ -5,8 +5,7 @@ import com.suihan74.hatena.exception.HttpException
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.junit.Assert.assertEquals
-import org.junit.Assert.fail
+import org.junit.Assert.*
 import org.junit.Test
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -453,5 +452,12 @@ class EntryServiceTest : AccountServiceTestCredentials() {
         entries.forEach {
             println(it)
         }
+    }
+
+    @Test
+    fun getEntry_withMyBookmark() = runBlocking {
+        val client = HatenaClient.signIn(rk)
+        val entry = client.entry.getEntry(4735775702463931269)
+        assertNotNull(entry.bookmarkedData)
     }
 }

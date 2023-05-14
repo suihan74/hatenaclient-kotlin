@@ -1,6 +1,7 @@
 package com.suihan74.hatena.api
 
 import com.suihan74.hatena.api.HatenaClient.baseUrlB
+import com.suihan74.hatena.bookmark.BookmarkResult
 import com.suihan74.hatena.entry.*
 import com.suihan74.hatena.exception.HttpException
 import com.suihan74.hatena.exception.InvalidResponseException
@@ -165,7 +166,7 @@ suspend fun EntryService.getEntry(eid: Long) : Entry = runCatching {
     getEntryImpl(commentPageUrl)
 }.getOrDefault(createDummyEntry("${baseUrlB}entry/$eid")) // TODO
 
-private suspend fun getEntryImpl(commentPageUrl: String) : Entry {
+private suspend fun EntryService.getEntryImpl(commentPageUrl: String) : Entry {
     return HatenaClient.generalService.getHtml(commentPageUrl) { html ->
         val root = html.getElementsByTag("html").first()!!
         val eid = root.attr("data-entry-eid").toLong()
@@ -186,6 +187,10 @@ private suspend fun getEntryImpl(commentPageUrl: String) : Entry {
         val faviconUrl = domainElement?.getElementsByTag("img")?.firstOrNull()?.attr("src")
         val description = html.getElementsByClass("entry-about-description").firstOrNull()?.text() ?: ""
 
+        val bookmark =
+            if (this is CertifiedEntryService) getBookmark(eid = eid, user = this.accountName)
+            else null
+
         EntryItem(
             eid = eid,
             title = title,
@@ -195,7 +200,8 @@ private suspend fun getEntryImpl(commentPageUrl: String) : Entry {
             _rootUrl = rootUrl,
             _faviconUrl = faviconUrl,
             _imageUrl = imageUrl,
-            createdAt = createdAt
+            createdAt = createdAt,
+            bookmarkedData = bookmark
         )
     }
 }
@@ -565,6 +571,8 @@ private fun parseTimestamp(header: Element, className: String) : Instant? =
 interface CertifiedEntryService : EntryService {
     val accountName : String
 
+    val generalService : GeneralService
+
     /**
      * サインインユーザーがブクマしたエントリ一覧を取得する
      *
@@ -617,6 +625,8 @@ interface CertifiedEntryService : EntryService {
 
 class CertifiedEntryServiceImpl(delegate : CertifiedEntryService) : CertifiedEntryService by delegate {
     override lateinit var accountName: String
+
+    override lateinit var generalService: GeneralService
 }
 
 /**
@@ -663,4 +673,23 @@ suspend fun CertifiedEntryService.getFollowingEntries(
             )
         }
     return entries
+}
+
+// ------ //
+
+/**
+ * エントリに指定ユーザーがつけたブコメを取得する
+ */
+private suspend fun EntryService.getBookmark(
+    eid: Long,
+    user: String
+) : BookmarkResult? {
+    return getBookmarkImpl(
+        url = "${HatenaClient.baseUrlB}entry/$eid/comment/$user",
+        eid = eid,
+        user = user,
+        generalService =
+        if (this is CertifiedEntryService) this.generalService
+        else HatenaClient.generalService
+    )
 }
