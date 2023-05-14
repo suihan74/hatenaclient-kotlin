@@ -199,6 +199,7 @@ class CertifiedHatenaClient internal constructor() : HatenaClientBase() {
         (bookmark as CertifiedBookmarkServiceImpl).let {
             it.accountName = accountName
             it.rks = rks
+            it.generalService = generalService
         }
         (star as CertifiedStarServiceImpl).let {
             it.accountName = accountName
@@ -224,6 +225,20 @@ class CertifiedHatenaClient internal constructor() : HatenaClientBase() {
     /** スター関係のAPI */
     override val star : CertifiedStarService =
         CertifiedStarServiceImpl(retrofitForStar.create(CertifiedStarService::class.java))
+
+    // ------ //
+
+    @OptIn(ExperimentalSerializationApi::class)
+    internal val generalService by lazy {
+        Retrofit.Builder()
+            .baseUrl("https://localhost/")
+            .addConverterFactory(
+                json.asConverterFactory("application/json".toMediaType())
+            )
+            .client(okHttpClient)
+            .build()
+            .create(GeneralService::class.java)
+    }
 
     // ------ //
 

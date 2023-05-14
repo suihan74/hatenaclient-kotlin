@@ -7,6 +7,10 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import retrofit2.http.*
+import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 /**
  * ブックマーク関係のAPI
@@ -143,6 +147,76 @@ suspend fun BookmarkService.getTweetsAndClicks(
     return __getTweetsAndClicks(requestBody)
 }
 
+/**
+ * エントリに指定ユーザーがつけたブコメを取得する
+ */
+suspend fun BookmarkService.getBookmark(
+    eid: Long,
+    user: String
+) : BookmarkResult? {
+    return getBookmarkImpl(
+        url = "${HatenaClient.baseUrlB}entry/$eid/comment/$user",
+        eid = eid,
+        user = user,
+        generalService =
+            if (this is CertifiedBookmarkService) this.generalService
+            else HatenaClient.generalService
+    )
+}
+
+private suspend fun getBookmarkImpl(
+    url: String,
+    eid: Long,
+    user: String,
+    generalService: GeneralService
+) : BookmarkResult? {
+    // サインインしていないクライアントでも取得できればprivateではないと判断する
+    val private =
+        if (generalService != HatenaClient.generalService) {
+            HatenaClient.generalService.get(url).code() != 200
+        }
+        else false
+
+    return runCatching {
+        generalService.getHtml(url) { doc ->
+            // ブクマされていない or アクセスできない
+            if (doc.getElementsByTag("html").first()!!.attr("data-page-scope") != "EntryComment") {
+                return@getHtml null
+            }
+
+            doc.getElementsByClass("comment-body").first()?.let { body ->
+                val comment = body.getElementsByClass("comment-body-text").text().orEmpty()
+                val tags =
+                    body.getElementsByClass("comment-body-tags").first()
+                        ?.getElementsByTag("li")
+                        ?.map { it.wholeText() }
+                        ?: emptyList()
+                val commentRaw = tags.joinToString(separator = "", postfix = comment) { "[$it]" }
+
+                val dateTimeFormatter = DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm")
+                val timestampStr = body.getElementsByClass("comment-body-date").first()!!.wholeText()
+                val timestamp =
+                    OffsetDateTime.of(
+                        LocalDateTime.parse(timestampStr, dateTimeFormatter),
+                        ZoneOffset.ofHours(9)
+                    ).toInstant()
+
+                BookmarkResult(
+                    user = user,
+                    comment = comment,
+                    tags = tags,
+                    timestamp = timestamp,
+                    userIconUrl = HatenaClient.user.getUserIconUrl(user),
+                    commentRaw = commentRaw,
+                    permalink = url,
+                    eid = eid,
+                    private = private
+                )
+            }
+        }
+    }.getOrNull()
+}
+
 // ------ //
 
 /**
@@ -152,6 +226,8 @@ interface CertifiedBookmarkService : BookmarkService {
     val accountName : String
 
     val rks : String
+
+    val generalService : GeneralService
 
     /**
      * ブックマークを投稿する
@@ -191,6 +267,7 @@ interface CertifiedBookmarkService : BookmarkService {
 class CertifiedBookmarkServiceImpl(delegate : CertifiedBookmarkService) : CertifiedBookmarkService by delegate {
     override lateinit var accountName: String
     override lateinit var rks: String
+    override lateinit var generalService: GeneralService
 }
 
 // ------ //

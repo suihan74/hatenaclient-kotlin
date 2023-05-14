@@ -13,7 +13,7 @@ import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert
-import org.junit.Assert.assertEquals
+import org.junit.Assert.*
 import org.junit.Test
 import retrofit2.Retrofit
 import java.net.URLEncoder
@@ -371,5 +371,48 @@ internal class BookmarkServiceTest : AccountServiceTestCredentials() {
         val client = HatenaClient.signIn(rk)
         client.bookmark.postBookmark(url, comment, private = true)
         client.bookmark.deleteBookmark(url = url)
+    }
+
+    @Test
+    fun getPrivateBookmark() = runBlocking {
+        val client = HatenaClient.signIn(rk)
+        val bookmarkResult = client.bookmark.getBookmark(
+            eid = 4735994197208831813,
+            user = "suihan74"
+        )
+        assertNotNull(bookmarkResult)
+        assertEquals(true, bookmarkResult!!.private)
+    }
+
+    @Test
+    fun getPrivateBookmark_fromNoCertifiedClient() = runBlocking {
+        val client = HatenaClient
+        val bookmarkResult = client.bookmark.getBookmark(
+            eid = 4735994197208831813,
+            user = "suihan74"
+        )
+        assertNull(bookmarkResult)
+    }
+
+    @Test
+    fun getPublicBookmark() = runBlocking {
+        val client = HatenaClient.signIn(rk)
+        val bookmarkResult = client.bookmark.getBookmark(
+            eid = 4735775702463931269,
+            user = "suihan74"
+        )
+        assertNotNull(bookmarkResult)
+        assertEquals(false, bookmarkResult!!.private)
+    }
+
+    @Test
+    fun getPublicBookmark_fromNoCertifiedClient() = runBlocking {
+        val client = HatenaClient
+        val bookmarkResult = client.bookmark.getBookmark(
+            eid = 4735775702463931269,
+            user = "suihan74"
+        )
+        assertNotNull(bookmarkResult)
+        assertEquals(false, bookmarkResult!!.private)
     }
 }

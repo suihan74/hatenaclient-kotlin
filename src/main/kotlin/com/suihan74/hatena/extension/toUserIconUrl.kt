@@ -5,3 +5,5 @@ package com.suihan74.hatena.extension
  */
 internal val String.toUserIconUrl : String get() =
     "https://cdn1.www.st-hatena.com/users/$this/profile.gif"
+
+//https://cdn.profile-image.st-hatena.com/users/$this/profile.png

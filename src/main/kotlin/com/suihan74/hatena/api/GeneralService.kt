@@ -112,7 +112,7 @@ suspend fun <T> GeneralService.getHtmlDetectedCharset(
 
     val result = runCatching {
         @Suppress("BlockingMethodInNonBlockingContext")
-        response.body()!!.use { body ->
+        response.body()!!.use {
             val doc =
                 if (charsetName == defaultCharsetName) rawDoc
                 else Jsoup.parse(bodyBytes.inputStream(), charsetName, url)
