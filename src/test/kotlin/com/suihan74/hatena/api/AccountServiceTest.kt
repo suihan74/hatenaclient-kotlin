@@ -60,6 +60,13 @@ internal class AccountServiceTest : AccountServiceTestCredentials() {
     }
 
     @Test
+    fun getAccount() = runBlocking {
+        val account = client.user.getAccount()
+        assertEquals(user, account.name)
+        println(Json.encodeToString(account))
+    }
+
+    @Test
     fun getIgnoredUsers() = runBlocking {
         fun printResult(response: IgnoredUsersResponse) {
             assert(response.users.isNotEmpty())

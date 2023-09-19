@@ -23,10 +23,10 @@ data class Notice(
     @SerialName("subject")
     val link : String,
 
-    val metadata : NoticeMetadata?,
-
     @SerialName("user_name")
-    val user : String
+    val user : String,
+
+    val metadata : NoticeMetadata? = null
 ) {
     val eid : Long by lazy {
         if (verb == Verb.STAR.value) {
