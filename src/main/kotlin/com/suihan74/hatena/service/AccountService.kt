@@ -4,10 +4,7 @@ import com.suihan74.hatena.api.AccountAPI
 import com.suihan74.hatena.api.CertifiedAccountAPI
 import com.suihan74.hatena.exception.HatenaException
 import com.suihan74.hatena.extension.toUserIconUrl
-import com.suihan74.hatena.model.account.NoticesResponse
-import com.suihan74.hatena.model.account.ReadNoticesResponse
-import com.suihan74.hatena.model.account.Tag
-import retrofit2.Response
+import com.suihan74.hatena.model.account.*
 
 
 /**
@@ -20,7 +17,7 @@ open class AccountService internal constructor(private val api: AccountAPI) {
      * @param user 対象ユーザーID
      * @throws HatenaException
      */
-    suspend fun getFollowings(user: String) : com.suihan74.hatena.model.account.FollowingsResponse =
+    suspend fun getFollowings(user: String) : FollowingsResponse =
         runCatching {
             api.getFollowings(user)
         }.onFailure {
@@ -33,7 +30,7 @@ open class AccountService internal constructor(private val api: AccountAPI) {
      * @param user 対象ユーザーID
      * @throws HatenaException
      */
-    suspend fun getFollowers(user: String) : com.suihan74.hatena.model.account.FollowersResponse =
+    suspend fun getFollowers(user: String) : FollowersResponse =
         runCatching {
             api.getFollowers(user)
         }.onFailure {
@@ -80,7 +77,7 @@ class CertifiedAccountService internal constructor(private val api: CertifiedAcc
      *
      * @throws HatenaException 通信失敗
      */
-    suspend fun getAccount() : com.suihan74.hatena.model.account.Account =
+    suspend fun getAccount() : Account =
         runCatching {
             api.getAccount()
         }.onFailure {
@@ -126,7 +123,7 @@ class CertifiedAccountService internal constructor(private val api: CertifiedAcc
     suspend fun getIgnoredUsers(
         limit: Int? = null,
         cursor: String? = null
-    ) : com.suihan74.hatena.model.account.IgnoredUsersResponse =
+    ) : IgnoredUsersResponse =
         runCatching {
             api.getIgnoredUsers(limit, cursor)
         }.onFailure {
@@ -141,12 +138,13 @@ class CertifiedAccountService internal constructor(private val api: CertifiedAcc
      * @param user 非表示にするユーザーID
      * @throws HatenaException 通信失敗
      */
-    suspend fun ignoreUser(user: String) : Response<Unit> =
+    suspend fun ignoreUser(user: String) {
         runCatching {
             api.ignoreUser(user)
         }.onFailure {
             throw HatenaException(cause = it)
         }.getOrThrow()
+    }
 
     /**
      * ユーザーを非表示にする
@@ -155,12 +153,13 @@ class CertifiedAccountService internal constructor(private val api: CertifiedAcc
      * @throws HatenaException code=500: ユーザーが存在しない
      * @throws HatenaException 通信失敗
      */
-    suspend fun unIgnoreUser(user: String) : Response<Unit> =
+    suspend fun unIgnoreUser(user: String) {
         runCatching {
             api.unIgnoreUser(user)
         }.onFailure {
             throw HatenaException(cause = it)
         }.getOrThrow()
+    }
 
 
     /**
@@ -168,7 +167,7 @@ class CertifiedAccountService internal constructor(private val api: CertifiedAcc
      *
      * @throws HatenaException 通信失敗
      */
-    suspend fun getIgnoredUsersAll() : com.suihan74.hatena.model.account.IgnoredUsersResponse {
+    suspend fun getIgnoredUsersAll() : IgnoredUsersResponse {
         var cursor: String? = null
         val users = buildList {
             do {
@@ -186,7 +185,7 @@ class CertifiedAccountService internal constructor(private val api: CertifiedAcc
                     }
             } while (result.isSuccess && cursor != null)
         }
-        return com.suihan74.hatena.model.account.IgnoredUsersResponse(users = users, cursor = cursor)
+        return IgnoredUsersResponse(users = users, cursor = cursor)
     }
 
     /**
