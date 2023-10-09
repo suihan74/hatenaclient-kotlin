@@ -1,6 +1,6 @@
 package com.suihan74.hatena.serializer
 
-import com.suihan74.hatena.star.StarColor
+import com.suihan74.hatena.model.star.StarColor
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor

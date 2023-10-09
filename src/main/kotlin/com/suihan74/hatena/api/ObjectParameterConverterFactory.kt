@@ -1,9 +1,10 @@
 package com.suihan74.hatena.api
 
-import com.suihan74.hatena.entry.*
 import com.suihan74.hatena.extension.int
-import com.suihan74.hatena.star.StarColor
-import com.suihan74.hatena.star.StarPalette
+import com.suihan74.hatena.model.entry.*
+import com.suihan74.hatena.model.entry.EntriesTypeQuery
+import com.suihan74.hatena.model.star.StarColor
+import com.suihan74.hatena.model.star.StarPalette
 import retrofit2.Converter
 import retrofit2.Retrofit
 import java.lang.reflect.Type

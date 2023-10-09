@@ -7,7 +7,6 @@ import java.net.URI
  *
  * getterで毎回パースが実行されるので，繰り返し参照する場合は適当にキャッシュすること
  */
-@OptIn(ExperimentalStdlibApi::class)
 val URI.queryParameters : Map<String, String> get() = buildMap {
     query?.split("&")?.forEach { param ->
         val delimiterIndex = param.indexOf("=")
