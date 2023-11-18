@@ -167,23 +167,24 @@ class CertifiedAccountService internal constructor(private val api: CertifiedAcc
      *
      * @throws HatenaException 通信失敗
      */
-    suspend fun getIgnoredUsersAll() : IgnoredUsersResponse {
+    suspend fun getIgnoredUsersAll(retryLimit: Int = 3) : IgnoredUsersResponse {
         var cursor: String? = null
+        var retryCount = 0
         val users = buildList {
             do {
-                val result =
-                    runCatching {
-                        getIgnoredUsers(limit = null, cursor = cursor)
-                    }.onSuccess {
-                        cursor = it.cursor
-                        addAll(it.users)
-                    }.onFailure {
-                        // 初回で失敗した場合は例外送出
-                        if (cursor == null) {
-                            throw it
-                        }
+                runCatching {
+                    getIgnoredUsers(limit = null, cursor = cursor)
+                }.onSuccess {
+                    cursor = it.cursor
+                    retryCount = 0
+                    addAll(it.users)
+                }.onFailure {
+                    // 指定回数失敗したら例外送出
+                    if (++retryCount >= retryLimit) {
+                        throw HatenaException(cause = it)
                     }
-            } while (result.isSuccess && cursor != null)
+                }
+            } while (cursor != null)
         }
         return IgnoredUsersResponse(users = users, cursor = cursor)
     }
