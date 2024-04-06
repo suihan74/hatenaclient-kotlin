@@ -107,6 +107,15 @@ interface CertifiedBookmarkAPI : BookmarkAPI {
         @Path("account") accountName: String = this.accountName,
         @Field("rks") rks: String = this.rks
     )
+
+    @POST("-/report/bookmark")
+    suspend fun report(
+        @Field("url") url: String,
+        @Field("user_name") userName: String,
+        @Field("category") category: String,
+        @Field("text") text: String,
+        @Field("rks") rks: String = this.rks
+    )
 }
 
 // ------ //

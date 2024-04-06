@@ -232,4 +232,19 @@ class CertifiedBookmarkService internal constructor(private val api: CertifiedBo
         }.onFailure {
             throw HatenaException(cause = it)
         }.getOrNull()
+
+    /**
+     * ブクマを通報する
+     */
+    suspend fun report(report: Report) : Unit =
+        runCatching {
+            api.report(
+                url = report.entry.url,
+                userName = report.bookmark.user,
+                category = report.reason.code,
+                text = report.comment.orEmpty()
+            )
+        }.onFailure {
+            throw HatenaException(cause = it)
+        }.getOrThrow()
 }
