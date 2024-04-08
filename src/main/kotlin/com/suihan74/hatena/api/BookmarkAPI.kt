@@ -108,6 +108,7 @@ interface CertifiedBookmarkAPI : BookmarkAPI {
         @Field("rks") rks: String = this.rks
     )
 
+    @FormUrlEncoded
     @POST("-/report/bookmark")
     suspend fun report(
         @Field("url") url: String,
