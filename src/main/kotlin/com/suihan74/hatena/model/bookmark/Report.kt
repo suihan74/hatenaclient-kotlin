@@ -12,14 +12,12 @@ data class Report(
         val code: String
     ) {
         /** スパム行為 */
-        SPAM("report.type.spam"),
-        /** 誹謗中傷 */
-        DEFAMATION("report.type.fud"),
+        SPAM("spam"),
         /** 犯罪予告 */
-        CRIME("report.type.crime"),
-        /** 差別・侮辱 */
-        INSULT("report.type.discrimination"),
+        CRIME("crime_notice"),
+        /** 差別、侮辱、嫌がらせ */
+        INSULT("insult"),
         /** その他 */
-        OTHERS("report.type.misc")
+        OTHERS("others")
     }
 }
